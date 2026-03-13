@@ -80,7 +80,8 @@
 | 字段名 | 数据类型 | 约束 | 描述 |
 | :--- | :--- | :--- | :--- |
 | id | INT(11) | NOT NULL AUTO_INCREMENT PRIMARY KEY | 主键ID |
-| title | VARCHAR(200) | NOT NULL | 条文标题 |
+| book_title | VARCHAR(200) | NOT NULL | 法律书标题 |
+| article_title | VARCHAR(200) | NOT NULL | 法律条文标题 |
 | content | TEXT | NOT NULL | 条文内容 |
 | publish_date | DATE | NOT NULL | 发布日期 |
 | effective_date | DATE | NOT NULL | 生效日期 |

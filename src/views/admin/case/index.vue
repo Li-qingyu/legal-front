@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi} from '@/api/case'
 import { queryAllApi as queryAllLegalTypeApi } from '@/api/type'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 
 //法律类型列表数据
 const legalTypes = ref([])
@@ -110,8 +111,57 @@ let clazz = ref({
   tags: '',
   content: '',
   cover: '',
-  status: 1
+  status: '1'
 })
+
+// 文件上传相关
+const uploadUrl = 'https://api.example.com/upload'; // 这里需要替换为实际的上传接口
+const uploadHeaders = ref({}); // 上传时的请求头
+const uploadDisabled = ref(false); // 是否禁用上传
+
+// 上传前的钩子函数
+const handleBeforeUpload = (file) => {
+  // 限制文件类型
+  const isImage = file.type.startsWith('image/');
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件！');
+    return false;
+  }
+  // 限制文件大小
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    ElMessage.error('上传图片大小不能超过 2MB！');
+    return false;
+  }
+  return true;
+};
+
+// 上传成功的回调函数
+const handleUploadSuccess = (response, uploadFile) => {
+  // 这里根据实际的上传接口返回格式来处理
+  // 假设返回格式为 { code: 200, data: { url: '图片URL' } }
+  if (response.code) {
+    clazz.value.cover = response.data.url;
+    ElMessage.success('图片上传成功');
+  } else {
+    ElMessage.error('图片上传失败');
+  }
+};
+
+// 上传失败的回调函数
+const handleUploadError = (error, uploadFile) => {
+  ElMessage.error('图片上传失败，请重试');
+};
+
+// 移除图片的回调函数
+const handleRemove = (file, fileList) => {
+  clazz.value.cover = '';
+};
+
+// 预览图片
+const handlePictureCardPreview = (uploadFile) => {
+  // 这里可以实现图片预览功能
+};
 
 //清空表单
 const clearClazz = () => {
@@ -122,7 +172,7 @@ const clearClazz = () => {
     tags: '',
     content: '',
     cover: '',
-    status: 1
+    status: '1'
   }
 }
 
@@ -140,7 +190,12 @@ const updateClazz = async (id) => {
   formTitle.value = '修改法律案例'
   let result = await queryInfoApi(id)
   if(result.code){
-    clazz.value = result.data
+    // 处理状态字段类型转换
+    const data = result.data;
+    clazz.value = {
+      ...data,
+      status: data.status.toString() // 将数字转换为字符串
+    };
   }
 }
 
@@ -340,7 +395,25 @@ const unpublishCase = async (id) => {
       </el-form-item>
 
       <el-form-item label="封面图片" :label-width="labelWidth">
-        <el-input v-model="clazz.cover" placeholder="请输入封面图片URL" />
+        <el-upload
+          class="avatar-uploader"
+          :action="uploadUrl"
+          :headers="uploadHeaders"
+          :disabled="uploadDisabled"
+          :show-file-list="true"
+          :on-before-upload="handleBeforeUpload"
+          :on-success="handleUploadSuccess"
+          :on-error="handleUploadError"
+          :on-remove="handleRemove"
+          :on-preview="handlePictureCardPreview"
+          :file-list="[]"
+          list-type="picture-card"
+          accept="image/*"
+        >
+          <el-icon v-if="!clazz.cover"><Plus /></el-icon>
+          <img v-else :src="clazz.cover" class="avatar" style="width: 100%; height: 100%; object-fit: cover;" />
+        </el-upload>
+        <el-button v-if="clazz.cover" type="danger" size="small" @click="clazz.cover = ''">移除图片</el-button>
       </el-form-item>
 
       <el-form-item label="状态" :label-width="labelWidth">
@@ -363,8 +436,181 @@ const unpublishCase = async (id) => {
 
 
 <style scoped>
+/* 页面容器 */
+.case-management {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 标题样式 */
 #title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #409eff;
+  display: flex;
+  align-items: center;
+}
+
+#title::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background-color: #409eff;
+  margin-right: 12px;
+  border-radius: 2px;
+}
+
+/* 搜索表单样式 */
+.demo-form-inline {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.demo-form-inline :deep(.el-form-item) {
+  margin-bottom: 0;
+  margin-right: 20px;
+}
+
+.demo-form-inline :deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 按钮样式 */
+.el-button {
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 表格样式 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-table :deep(th) {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+}
+
+.el-table :deep(td) {
+  padding: 12px 0;
+}
+
+.el-table :deep(.el-table__row:hover) {
+  background-color: #f5f7fa;
+}
+
+/* 表格中的图片样式 */
+.el-table img {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 操作按钮样式 */
+.el-table .el-button {
+  margin: 0 4px;
+}
+
+/* 分页样式 */
+.el-pagination {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 对话框样式 */
+:deep(.el-dialog) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-dialog__header) {
+  background-color: #f5f7fa;
+  padding: 20px;
+  margin: 0;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+:deep(.el-dialog__title) {
+  font-weight: 600;
+  color: #303133;
+}
+
+:deep(.el-dialog__body) {
+  padding: 30px 20px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 15px 20px;
+  border-top: 1px solid #e4e7ed;
+  background-color: #f5f7fa;
+}
+
+/* 表单样式 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input__inner:focus),
+:deep(.el-textarea__inner:focus) {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+/* 上传组件样式 */
+:deep(.el-upload--picture-card) {
+  border-radius: 8px;
+  border: 2px dashed #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-upload--picture-card:hover) {
+  border-color: #409eff;
+  background-color: #f5f7fa;
+}
+
+/* 状态标签样式 */
+.status-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-published {
+  background-color: #e6f7e6;
+  color: #52c41a;
+}
+
+.status-unpublished {
+  background-color: #fff1f0;
+  color: #ff4d4f;
 }
 </style>

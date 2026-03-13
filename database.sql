@@ -75,13 +75,15 @@ CREATE TABLE IF NOT EXISTS `ai_consultation` (
 -- 法律条文表
 CREATE TABLE IF NOT EXISTS `law_article` (
   `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `title` VARCHAR(200) NOT NULL COMMENT '条文标题',
+  `book_title` VARCHAR(200) NOT NULL COMMENT '法律书标题',
+  `article_title` VARCHAR(200) NOT NULL COMMENT '法律条文标题',
   `content` TEXT NOT NULL COMMENT '条文内容',
   `publish_date` DATE NOT NULL COMMENT '发布日期',
   `effective_date` DATE NOT NULL COMMENT '生效日期',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_book_title` (`book_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='法律条文表';
 
 -- 初始化数据
@@ -103,7 +105,8 @@ INSERT INTO `law_case` (`title`, `type_id`, `tags`, `content`, `cover`, `status`
 ('交通事故赔偿案例', 1, '交通事故,赔偿', '张某因交通事故受伤，通过法律途径获得了合理的赔偿。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20case%20traffic%20accident&image_size=square', 1);
 
 -- 法律条文
-INSERT INTO `law_article` (`title`, `content`, `publish_date`, `effective_date`) VALUES
-('中华人民共和国民法典', '《中华人民共和国民法典》是新中国成立以来第一部以"法典"命名的法律，是新时代我国社会主义法治建设的重大成果。', '2020-05-28', '2021-01-01'),
-('中华人民共和国刑法', '《中华人民共和国刑法》是规定犯罪和刑罚的法律，是维护社会秩序和保障公民权利的重要法律。', '2020-12-26', '2021-03-01'),
-('中华人民共和国劳动合同法', '《中华人民共和国劳动合同法》是规范劳动关系的重要法律，旨在保护劳动者的合法权益。', '2012-12-28', '2013-07-01');
+INSERT INTO `law_article` (`book_title`, `article_title`, `content`, `publish_date`, `effective_date`) VALUES
+('中华人民共和国民法典', '第一条', '为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，适应中国特色社会主义发展要求，弘扬社会主义核心价值观，根据宪法，制定本法。', '2020-05-28', '2021-01-01'),
+('中华人民共和国劳动合同法', '第一条', '用人单位违反本法规定解除或者终止劳动合同，劳动者要求继续履行劳动合同的，用人单位应当继续履行；劳动者不要求继续履行劳动合同或者劳动合同已经不能继续履行的，用人单位应当依照本法第八十七条规定支付赔偿金。', '2012-12-28', '2013-07-01'),
+('中华人民共和国劳动合同法', '第八十七条', '用人单位违反本法规定解除或者终止劳动合同的，应当依照本法第四十七条规定的经济补偿标准的二倍向劳动者支付赔偿金。', '2012-12-28', '2013-07-01'),
+('中华人民共和国刑法', '第一条', '为了惩罚犯罪，保护人民，根据宪法，结合我国同犯罪作斗争的具体经验及实际情况，制定本法。', '2020-12-26', '2021-03-01');

@@ -162,7 +162,139 @@ const rules=ref({
 </template>
 
 <style scoped>
-.container{
+/* 页面容器 */
+.type-management {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 标题样式 */
+h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #409eff;
+  display: flex;
+  align-items: center;
+}
+
+h3::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background-color: #409eff;
+  margin-right: 12px;
+  border-radius: 2px;
+}
+
+/* 容器样式 */
+.container {
   margin: 20px 0;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 搜索框样式 */
+.container .el-input {
+  margin-right: 10px;
+}
+
+.container .el-input :deep(.el-input__inner) {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.container .el-input :deep(.el-input__inner:focus) {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+/* 按钮样式 */
+.el-button {
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 表格样式 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-table :deep(th) {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+}
+
+.el-table :deep(td) {
+  padding: 12px 0;
+}
+
+.el-table :deep(.el-table__row:hover) {
+  background-color: #f5f7fa;
+}
+
+/* 操作按钮样式 */
+.el-table .el-button {
+  margin: 0 4px;
+}
+
+/* 对话框样式 */
+:deep(.el-dialog) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-dialog__header) {
+  background-color: #f5f7fa;
+  padding: 20px;
+  margin: 0;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+:deep(.el-dialog__title) {
+  font-weight: 600;
+  color: #303133;
+}
+
+:deep(.el-dialog__body) {
+  padding: 30px 20px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 15px 20px;
+  border-top: 1px solid #e4e7ed;
+  background-color: #f5f7fa;
+}
+
+/* 表单样式 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input__inner:focus),
+:deep(.el-textarea__inner:focus) {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
 }
 </style>

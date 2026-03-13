@@ -60,19 +60,21 @@ let dialogFormVisible = ref(false) //控制新增/修改的对话框的显示与
 let labelWidth = ref(100) //form表单label的宽度
 let formTitle = ref('') //表单的标题
 let stu = ref({ //用户对象-表单数据绑定
-  name: '',
+  id: '',
+  username: '',
   email: '',
   phone: '',
-  status: 1
+  status: '1'
 })
 
 //清空表单
 const clearStu = () => {
   stu.value = {
-    name: '',
+    id: '',
+    username: '',
     email: '',
     phone: '',
-    status: 1
+    status: '1'
   }
 }
 
@@ -90,14 +92,19 @@ const updateStu = async (id) => {
   formTitle.value = '修改用户'
   let result = await queryInfoApi(id)
   if(result.code){
-    stu.value = result.data
+    // 处理状态字段类型转换
+    const data = result.data;
+    stu.value = {
+      ...data,
+      status: (data.status || '1').toString() // 将数字转换为字符串，默认值为'1'
+    };
   }
 }
 
 //表单校验规则
 const stuFormRef = ref()
 const rules = ref({
-  name: [
+  username: [
     { required: true, message: '用户名为必填项', trigger: 'blur' },
     { min: 2, max: 20, message: '用户名长度为2-20个字', trigger: 'blur' }
   ],
@@ -268,8 +275,8 @@ const enableUser = async (id) => {
       <!-- 第一行 -->
       <el-row>
         <el-col :span="12">
-          <el-form-item label="用户名" :label-width="labelWidth" prop="name">
-            <el-input v-model="stu.name" placeholder="请输入用户名"/>
+          <el-form-item label="用户名" :label-width="labelWidth" prop="username">
+            <el-input v-model="stu.username" placeholder="请输入用户名"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -312,8 +319,161 @@ const enableUser = async (id) => {
 
 
 <style scoped>
+/* 页面容器 */
+.user-management {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 标题样式 */
 #title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #409eff;
+  display: flex;
+  align-items: center;
+}
+
+#title::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background-color: #409eff;
+  margin-right: 12px;
+  border-radius: 2px;
+}
+
+/* 搜索表单样式 */
+.demo-form-inline {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.demo-form-inline :deep(.el-form-item) {
+  margin-bottom: 0;
+  margin-right: 20px;
+}
+
+.demo-form-inline :deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 按钮样式 */
+.el-button {
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 表格样式 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.el-table :deep(th) {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+}
+
+.el-table :deep(td) {
+  padding: 12px 0;
+}
+
+.el-table :deep(.el-table__row:hover) {
+  background-color: #f5f7fa;
+}
+
+/* 操作按钮样式 */
+.el-table .el-button {
+  margin: 0 4px;
+}
+
+/* 分页样式 */
+.el-pagination {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 对话框样式 */
+:deep(.el-dialog) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-dialog__header) {
+  background-color: #f5f7fa;
+  padding: 20px;
+  margin: 0;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+:deep(.el-dialog__title) {
+  font-weight: 600;
+  color: #303133;
+}
+
+:deep(.el-dialog__body) {
+  padding: 30px 20px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 15px 20px;
+  border-top: 1px solid #e4e7ed;
+  background-color: #f5f7fa;
+}
+
+/* 表单样式 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-input__inner) {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input__inner:focus) {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+/* 状态标签样式 */
+.status-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-enabled {
+  background-color: #e6f7e6;
+  color: #52c41a;
+}
+
+.status-disabled {
+  background-color: #fff1f0;
+  color: #ff4d4f;
 }
 </style>

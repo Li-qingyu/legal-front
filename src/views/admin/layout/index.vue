@@ -52,8 +52,9 @@ const logout=()=>{
                 <el-icon><Menu /></el-icon>管理菜单
               </template>
                 <el-menu-item index="/admin/case"><el-icon><HelpFilled /></el-icon>法律案例管理</el-menu-item>
-                <el-menu-item index="/admin/user"><el-icon><UserFilled /></el-icon>用户管理</el-menu-item>
                 <el-menu-item index="/admin/type"><el-icon><HelpFilled /></el-icon>法律类型管理</el-menu-item>
+                <el-menu-item index="/admin/user"><el-icon><UserFilled /></el-icon>用户管理</el-menu-item>
+
             </el-sub-menu>
           
           </el-menu>
@@ -70,31 +71,95 @@ const logout=()=>{
 </template>
 
 <style scoped>
+/* 整体布局 */
+.common-layout {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+/* Header 样式 */
 .header {
-  background-image: linear-gradient(to right, #00547d, #007fa4, #00aaa0, #00d072, #a8eb12);
+  background: linear-gradient(135deg, #1a5fb4 0%, #3584e4 50%, #62a0ea 100%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 100;
 }
 
 .title {
   color: white;
-  font-size: 40px;
-  font-family: 楷体;
+  font-size: 28px;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
   line-height: 60px;
-  font-weight: bolder;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.right_tool{
+.right_tool {
   float: right;
   line-height: 60px;
 }
 
-a {
+.right_tool a {
   color: white;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
+.right_tool a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 左侧菜单样式 */
 .aside {
   width: 220px;
-  border-right: 1px solid #ccc;
-  height: 730px;
+  background-color: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - 60px);
+}
+
+.aside :deep(.el-menu) {
+  border-right: none;
+  padding: 10px 0;
+}
+
+.aside :deep(.el-menu-item),
+.aside :deep(.el-sub-menu__title) {
+  height: 50px;
+  line-height: 50px;
+  margin: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.aside :deep(.el-menu-item:hover),
+.aside :deep(.el-sub-menu__title:hover) {
+  background-color: #ecf5ff;
+  color: #409eff;
+}
+
+.aside :deep(.el-menu-item.is-active) {
+  background-color: #409eff;
+  color: white;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+}
+
+.aside :deep(.el-icon) {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+/* 主内容区域 */
+:deep(.el-main) {
+  padding: 0;
+  background-color: #f5f7fa;
 }
 </style>
