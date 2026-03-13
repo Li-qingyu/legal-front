@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案例收藏 - 法律咨询平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .collection-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .collection-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .collection-item h3 {
+            margin-top: 0;
+        }
+        .collection-item .meta {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .collection-item .actions {
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .empty {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="nav">
+            <div>
+                <a href="index.html">首页</a>
+                <a href="case-page.html">法律案例</a>
+                <a href="ai-consultation.html">AI法律咨询</a>
+                <a href="case-collection.html">案例收藏</a>
+            </div>
+            <div>
+                <a href="login.html">退出登录</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="content">
+            <h2>我的案例收藏</h2>
+            <div class="collection-list">
+                <div class="collection-item">
+                    <h3>离婚财产分割案例</h3>
+                    <div class="meta">
+                        <span>类型：民事</span> | 
+                        <span>发布时间：2026-03-01</span>
+                    </div>
+                    <p>本案例涉及夫妻双方在离婚时的财产分割问题，法院根据《民法典》相关规定进行了判决。</p>
+                    <div class="actions">
+                        <a href="case-page.html" class="btn">查看详情</a>
+                        <a href="#" class="btn btn-danger">取消收藏</a>
+                    </div>
+                </div>
+                <div class="collection-item">
+                    <h3>劳动合同纠纷案例</h3>
+                    <div class="meta">
+                        <span>类型：劳动</span> | 
+                        <span>发布时间：2026-03-02</span>
+                    </div>
+                    <p>本案例涉及员工与用人单位之间的劳动合同纠纷，最终通过劳动仲裁解决。</p>
+                    <div class="actions">
+                        <a href="case-page.html" class="btn">查看详情</a>
+                        <a href="#" class="btn btn-danger">取消收藏</a>
+                    </div>
+                </div>
+                <div class="collection-item">
+                    <h3>交通事故赔偿案例</h3>
+                    <div class="meta">
+                        <span>类型：侵权</span> | 
+                        <span>发布时间：2026-03-03</span>
+                    </div>
+                    <p>本案例涉及交通事故后的赔偿问题，法院根据责任认定进行了赔偿判决。</p>
+                    <div class="actions">
+                        <a href="case-page.html" class="btn">查看详情</a>
+                        <a href="#" class="btn btn-danger">取消收藏</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>法律类型管理 - 法律咨询平台管理端</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .top-header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-header .logo {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .top-header .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .top-header a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        .top-header a:hover {
+            background-color: #555;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin: 10px 0;
+        }
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+        }
+        .sidebar a:hover {
+            color: #007bff;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .page-header {
+            background-color: white;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .page-header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding: 5px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="logo">法律咨询平台管理端</div>
+        <div class="user-actions">
+            <a href="#">修改密码</a>
+            <a href="login.html">退出登录</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>管理菜单</h2>
+            <ul>
+                <li><a href="admin-user.html">用户管理</a></li>
+                <li><a href="admin-law-type.html">法律类型管理</a></li>
+                <li><a href="admin-case.html">法律案例管理</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>法律类型管理</h1>
+            </div>
+            <div class="content">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索法律类型...">
+                    <button class="btn">搜索</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <a href="#" class="btn">添加法律类型</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>类型名称</th>
+                            <th>描述</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>民事</td>
+                            <td>涉及公民之间、法人之间、公民和法人之间的财产关系和人身关系的法律</td>
+                            <td>
+                                <a href="#" class="btn">编辑</a>
+                                <a href="#" class="btn btn-danger">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>刑事</td>
+                            <td>涉及犯罪和刑罚的法律</td>
+                            <td>
+                                <a href="#" class="btn">编辑</a>
+                                <a href="#" class="btn btn-danger">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>行政</td>
+                            <td>涉及国家行政机关管理活动的法律</td>
+                            <td>
+                                <a href="#" class="btn">编辑</a>
+                                <a href="#" class="btn btn-danger">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>劳动</td>
+                            <td>涉及劳动关系和社会保障的法律</td>
+                            <td>
+                                <a href="#" class="btn">编辑</a>
+                                <a href="#" class="btn btn-danger">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>侵权</td>
+                            <td>涉及侵权责任的法律</td>
+                            <td>
+                                <a href="#" class="btn">编辑</a>
+                                <a href="#" class="btn btn-danger">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
