@@ -13,7 +13,7 @@ export const queryPageApi = (username, currentPage, pageSize) => {
           nickname: '管理员',
           email: 'admin@example.com',
           phone: '13800138000',
-          role: 'admin',
+          role: 1,
           createTime: '2026-03-01 10:00:00'
         },
         {
@@ -23,7 +23,7 @@ export const queryPageApi = (username, currentPage, pageSize) => {
           nickname: '用户1',
           email: 'user1@example.com',
           phone: '13800138001',
-          role: 'user',
+          role: 0,
           createTime: '2026-03-02 10:00:00'
         },
         {
@@ -33,7 +33,7 @@ export const queryPageApi = (username, currentPage, pageSize) => {
           nickname: '用户2',
           email: 'user2@example.com',
           phone: '13800138002',
-          role: 'user',
+          role: 0,
           createTime: '2026-03-03 10:00:00'
         }
       ],
@@ -53,7 +53,7 @@ export const queryInfoApi = (id) => {
       nickname: '管理员',
       email: 'admin@example.com',
       phone: '13800138000',
-      role: 'admin'
+      role: 1
     }
   });
 };

@@ -45,7 +45,7 @@
 | nickname | VARCHAR(50) | NOT NULL | 昵称 |
 | email | VARCHAR(100) | NOT NULL UNIQUE | 邮箱 |
 | phone | VARCHAR(20) | NOT NULL UNIQUE | 手机号 |
-| role | VARCHAR(20) | NOT NULL DEFAULT 'user' | 角色：admin-管理员，user-普通用户 |
+| role | INT(11) | NOT NULL DEFAULT 0 | 角色：1-管理员，0-普通用户 |
 | status | TINYINT(1) | NOT NULL DEFAULT 1 | 状态：1-启用，0-禁用 |
 | create_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 | update_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |

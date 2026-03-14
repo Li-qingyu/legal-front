@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `nickname` VARCHAR(50) NOT NULL COMMENT '昵称',
   `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
   `phone` VARCHAR(20) NOT NULL COMMENT '手机号',
-  `role` VARCHAR(20) NOT NULL DEFAULT 'user' COMMENT '角色：admin-管理员，user-普通用户',
+  `role` INT(11) NOT NULL DEFAULT 0 COMMENT '角色：1-管理员，0-普通用户',
   `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1-启用，0-禁用',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -95,8 +95,8 @@ INSERT INTO `law_type` (`name`, `description`) VALUES
 
 -- 用户
 INSERT INTO `user` (`username`, `password`, `nickname`, `email`, `phone`, `role`, `status`) VALUES
-('admin', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '管理员', 'admin@example.com', '13800138000', 'admin', 1),
-('user1', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '用户1', 'user1@example.com', '13800138001', 'user', 1);
+('admin', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '管理员', 'admin@example.com', '13800138000', 1, 1),
+('user1', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '用户1', 'user1@example.com', '13800138001', 0, 1);
 
 -- 法律案例
 INSERT INTO `law_case` (`title`, `type_id`, `tags`, `content`, `cover`, `status`) VALUES
