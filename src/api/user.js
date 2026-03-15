@@ -2,45 +2,9 @@ import request from "@/utils/request";
 
 // 分页查询用户
 export const queryPageApi = (username, currentPage, pageSize) => {
-  return Promise.resolve({
-    code: true,
-    data: {
-      rows: [
-        {
-          id: 1,
-          username: 'admin',
-          password: '123456',
-          nickname: '管理员',
-          email: 'admin@example.com',
-          phone: '13800138000',
-          role: 1,
-          createTime: '2026-03-01 10:00:00'
-        },
-        {
-          id: 2,
-          username: 'user1',
-          password: '123456',
-          nickname: '用户1',
-          email: 'user1@example.com',
-          phone: '13800138001',
-          role: 0,
-          createTime: '2026-03-02 10:00:00'
-        },
-        {
-          id: 3,
-          username: 'user2',
-          password: '123456',
-          nickname: '用户2',
-          email: 'user2@example.com',
-          phone: '13800138002',
-          role: 0,
-          createTime: '2026-03-03 10:00:00'
-        }
-      ],
-      total: 3
-    }
-  });
-};
+  return request.get(`/admin/users?name=${username}&page=${currentPage}&pageSize=${pageSize}`)
+}
+
 
 // 根据ID查询用户
 export const queryInfoApi = (id) => {

@@ -5,7 +5,7 @@ import axios from 'axios'
 
 //创建axios实例对象
 const request = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: '/api',
   timeout: 600000
 })
 

@@ -43,7 +43,7 @@ const queryPage = async () => {
   );
 
   if(result.code) {
-    tableData.value = result.data.rows
+    tableData.value = result.data.records
     pagination.value.total = result.data.total
   }
 }
@@ -236,7 +236,7 @@ const enableUser = async (id) => {
     <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
       <el-table-column type="selection"  align="center" width="35" />
       <el-table-column prop="id" label="ID" align="center" width="50px" />
-      <el-table-column prop="name" label="用户名" align="center" width="100px" />
+      <el-table-column prop="username" label="用户名" align="center" width="100px" />
       <el-table-column prop="email" label="邮箱" align="center" width="200px"/>
       <el-table-column prop="phone" label="手机号" align="center" width="130px"/>
       <el-table-column prop="status" label="状态" align="center" width="80px" >
