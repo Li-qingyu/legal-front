@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // 修复：更新LoginView的导入路径
 import LoginView from '@/views/user/login/index.vue'
+import RegisterView from '@/views/user/register/index.vue'
 import UserIndexView from '@/views/user/index/index.vue'
 import CaseView from '@/views/admin/case/index.vue'
 import TypeView from '@/views/admin/type/index.vue'
@@ -33,7 +34,8 @@ const router = createRouter({
         { path: 'type', name: 'type', component: TypeView },
       ]
     },
-    { path: '/login', name: 'login', component: LoginView }
+    { path: '/login', name: 'login', component: LoginView },
+    { path: '/register', name: 'register', component: RegisterView }
   ]
 })
 
