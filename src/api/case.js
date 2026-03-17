@@ -63,9 +63,10 @@ export const queryInfoApi = (id) => {
 
 // 添加法律案例
 export const addApi = (data) => {
-  return Promise.resolve({
-    code: true,
-    msg: '添加成功'
+  return request({
+    url: '/api/case',
+    method: 'post',
+    data
   });
 };
 

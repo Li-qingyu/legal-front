@@ -115,7 +115,7 @@ let clazz = ref({
 })
 
 // 文件上传相关
-const uploadUrl = 'https://api.example.com/upload'; // 这里需要替换为实际的上传接口
+const uploadUrl = '/api/upload'; // 这里需要替换为实际的上传接口
 const uploadHeaders = ref({}); // 上传时的请求头
 const uploadDisabled = ref(false); // 是否禁用上传
 

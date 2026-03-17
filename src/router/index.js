@@ -7,6 +7,7 @@ import UserIndexView from '@/views/user/index/index.vue'
 import CaseView from '@/views/admin/case/index.vue'
 import TypeView from '@/views/admin/type/index.vue'
 import UserView from '@/views/admin/user/index.vue'
+import LawArticleView from '@/views/admin/law-article/index.vue'
 import LayoutView from '@/views/admin/layout/index.vue'
 import IndexView from '@/views/admin/index/index.vue'
 
@@ -32,6 +33,7 @@ const router = createRouter({
         { path: 'case', name: 'case', component: CaseView },
         { path: 'user', name: 'user', component: UserView },
         { path: 'type', name: 'type', component: TypeView },
+        { path: 'law-article', name: 'law-article', component: LawArticleView },
       ]
     },
     { path: '/login', name: 'login', component: LoginView },
