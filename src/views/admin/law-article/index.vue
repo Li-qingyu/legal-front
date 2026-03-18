@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, importApi} from '@/api/law-article'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 
 
 //搜索表单对象
-let searchStu = ref({bookTitle: ''}) 
+let searchStu = ref({bookTitle: '', articleTitle: ''}) 
 //列表展示数据
 let tableData = ref([])
 
@@ -14,6 +14,14 @@ onMounted(() => {
   queryPage()
 })
 
+//监听搜索条件变化，当搜索条件变为空时自动更新页面数据
+watch(searchStu, (newVal, oldVal) => {
+  if ((!newVal.bookTitle || newVal.bookTitle === '') && 
+      (!newVal.articleTitle || newVal.articleTitle === '') && 
+      (oldVal.bookTitle || oldVal.articleTitle)) {
+    queryPage()
+  }
+}, { deep: true })
 
 //复选框
 let selectIds = ref([])
@@ -38,26 +46,31 @@ const handleCurrentChange = (page) => {
 const queryPage = async () => {
   const result = await queryPageApi(
       searchStu.value.bookTitle,
+      searchStu.value.articleTitle,
       pagination.value.currentPage,
       pagination.value.pageSize
   );
 
   if(result.code) {
-    tableData.value = result.data.records
+    // 为每条数据添加自增ID
+    tableData.value = result.data.records.map((item, index) => ({
+      ...item,
+      autoId: (pagination.value.currentPage - 1) * pagination.value.pageSize + index + 1
+    }))
     pagination.value.total = result.data.total
   }
 }
 
 //清空搜索栏
 const clear = () => {
-  searchStu.value = {bookTitle: ''}
+  searchStu.value = {bookTitle: '', articleTitle: ''}
   queryPage()
 }
 
 
 //----------- 新增 / 修改 ---------------------------
 let dialogFormVisible = ref(false) //控制新增/修改的对话框的显示与隐藏
-let labelWidth = ref(100) //form表单label的宽度
+let labelWidth = ref(120) //form表单label的宽度
 let formTitle = ref('') //表单的标题
 let stu = ref({ //法律条文对象-表单数据绑定
   id: '',
@@ -253,6 +266,10 @@ const importLawArticles = async () => {
         <el-input v-model="searchStu.bookTitle" placeholder="搜索法律书标题..."/>
       </el-form-item>
 
+      <el-form-item label="法律条文标题">
+        <el-input v-model="searchStu.articleTitle" placeholder="搜索法律条文标题..."/>
+      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="queryPage()">搜索</el-button>
       </el-form-item>
@@ -268,7 +285,11 @@ const importLawArticles = async () => {
     <!-- 列表展示 -->
     <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
       <el-table-column type="selection"  align="center" width="35" />
-      <el-table-column prop="id" label="ID" align="center" width="50px" />
+      <el-table-column label="ID" align="center" width="50px">
+        <template #default="scope">
+          {{ scope.row.autoId }}
+        </template>
+      </el-table-column>
       <el-table-column prop="bookTitle" label="法律书标题" align="center" width="200px" />
       <el-table-column prop="articleTitle" label="法律条文标题" align="center" width="200px"/>
       <el-table-column prop="content" label="条文内容" align="center">
@@ -307,7 +328,7 @@ const importLawArticles = async () => {
         <el-row>
           <el-col :span="24">
             <el-form-item label="法律书标题" :label-width="labelWidth" prop="bookTitle">
-              <el-input v-model="stu.bookTitle" placeholder="请输入法律书标题" style="width: 100%"/>
+              <el-input v-model="stu.bookTitle" placeholder="请输入法律书标题" style="width: 100%" size="default"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -316,7 +337,7 @@ const importLawArticles = async () => {
         <el-row>
           <el-col :span="24">
             <el-form-item label="法律条文标题" :label-width="labelWidth" prop="articleTitle">
-              <el-input v-model="stu.articleTitle" placeholder="请输入法律条文标题" style="width: 100%"/>
+              <el-input v-model="stu.articleTitle" placeholder="请输入法律条文标题" style="width: 100%" size="default"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -330,6 +351,7 @@ const importLawArticles = async () => {
                 type="date"
                 placeholder="选择发布日期"
                 style="width: 100%"
+                size="default"
               />
             </el-form-item>
           </el-col>
@@ -340,6 +362,7 @@ const importLawArticles = async () => {
                 type="date"
                 placeholder="选择生效日期"
                 style="width: 100%"
+                size="default"
               />
             </el-form-item>
           </el-col>
@@ -355,6 +378,7 @@ const importLawArticles = async () => {
                 rows="6"
                 placeholder="请输入条文内容"
                 style="width: 100%"
+                size="default"
               />
             </el-form-item>
           </el-col>

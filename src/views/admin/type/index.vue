@@ -1,5 +1,5 @@
 <script setup>
-import {ref,onMounted} from 'vue'
+import {ref,onMounted, watch} from 'vue'
 import { queryAllApi,addApi,queryIdApi,updateApi,deleteIdApi } from '@/api/type';
 import { ElMessage ,ElMessageBox} from 'element-plus'
 
@@ -13,11 +13,23 @@ const dept=ref({name:'', description:''});
 const deptFormRef=ref();//绑定表单对象
 const searchKeyword=ref('');//搜索关键字
 
+//监听搜索关键字变化，当搜索关键字变为空时自动更新页面数据
+watch(searchKeyword, (newVal, oldVal) => {
+  if ((!newVal || newVal === '') && 
+      (oldVal)) {
+    search()
+  }
+})
+
 //查询
 const search = async()=>{
   const result =await queryAllApi();
   if(result.code){
-    deptList.value=result.data;
+    // 为每条数据添加自增ID
+    deptList.value=result.data.map((item, index) => ({
+      ...item,
+      autoId: index + 1
+    }));
   }else{
       //失败
       //提示操作信息
@@ -147,7 +159,11 @@ const rules=ref({
 
   <div class="container">
     <el-table :data="deptList" border style="width: 100%">
-      <el-table-column type="index" label="ID" width="80" align="center" />
+      <el-table-column label="ID" width="80" align="center">
+        <template #default="scope">
+          {{ scope.row.autoId }}
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="类型名称" width="150" align="center"/>
       <el-table-column prop="description" label="描述" align="center"/>
       <el-table-column prop="updateTime" label="最后操作时间"width="200" align="center"/>

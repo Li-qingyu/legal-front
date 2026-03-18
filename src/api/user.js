@@ -8,42 +8,22 @@ export const queryPageApi = (username, currentPage, pageSize) => {
 
 // 根据ID查询用户
 export const queryInfoApi = (id) => {
-  return Promise.resolve({
-    code: true,
-    data: {
-      id: id,
-      username: 'admin',
-      password: '123456',
-      nickname: '管理员',
-      email: 'admin@example.com',
-      phone: '13800138000',
-      role: 1
-    }
-  });
+  return request.get(`/admin/users/${id}`)
 };
 
 // 添加用户
 export const addApi = (data) => {
-  return Promise.resolve({
-    code: true,
-    msg: '添加成功'
-  });
+  return request.post('/admin/users',data);
 };
 
 // 更新用户
 export const updateApi = (data) => {
-  return Promise.resolve({
-    code: true,
-    msg: '更新成功'
-  });
+  return request.put(`/admin/users`,data);
 };
 
 // 删除用户
 export const deleteApi = (id) => {
-  return Promise.resolve({
-    code: true,
-    msg: '删除成功'
-  });
+  return request.delete(`/admin/users/${id}`);
 };
 
 // 修改密码
@@ -52,4 +32,10 @@ export const updatePasswordApi = (id, oldPassword, newPassword) => {
     code: true,
     msg: '密码修改成功'
   });
+};
+
+// 更新用户状态
+export const updateStatusApi = (id, status) => {
+  // 将 status 放入 params 配置中，作为查询参数发送
+  return request.post(`/admin/users/${id}/status`, null, { params: { status } });
 };

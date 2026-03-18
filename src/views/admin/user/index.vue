@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi} from '@/api/user'
+import { onMounted, ref, watch } from 'vue'
+import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, updateStatusApi} from '@/api/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 
@@ -14,6 +14,13 @@ onMounted(() => {
   queryPage()
 })
 
+//监听搜索条件变化，当搜索条件变为空时自动更新页面数据
+watch(searchStu, (newVal, oldVal) => {
+  if ((!newVal.name || newVal.name === '') && 
+      (oldVal.name)) {
+    queryPage()
+  }
+}, { deep: true })
 
 //复选框
 let selectIds = ref([])
@@ -43,7 +50,11 @@ const queryPage = async () => {
   );
 
   if(result.code) {
-    tableData.value = result.data.records
+    // 为每条数据添加自增ID
+    tableData.value = result.data.records.map((item, index) => ({
+      ...item,
+      autoId: (pagination.value.currentPage - 1) * pagination.value.pageSize + index + 1
+    }))
     pagination.value.total = result.data.total
   }
 }
@@ -185,27 +196,20 @@ const delByIds = async () => {
     })
 }
 
-//禁用用户
-const disableUser = async (id) => {
-  ElMessageBox.confirm('您确认禁用此用户吗?' , '禁用用户', {confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'})
+//更新用户状态
+const updateUserStatus = async (id, status) => {
+  const statusText = status === 0 ? '禁用' : '启用'
+  ElMessageBox.confirm(`您确认${statusText}此用户吗?` , `${statusText}用户`, {confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'})
     .then(async () => {
-      // 这里需要实现禁用功能
-      ElMessage.success('禁用成功')
-      queryPage()
+      let result = await updateStatusApi(id, status)
+      if(result.code) {
+        ElMessage.success(`${statusText}成功`)
+        queryPage()
+      }else {
+        ElMessage.error(result.msg)
+      }
     }).catch(() => {
-      ElMessage.info('取消禁用')
-    })
-}
-
-//启用用户
-const enableUser = async (id) => {
-  ElMessageBox.confirm('您确认启用此用户吗?' , '启用用户', {confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'})
-    .then(async () => {
-      // 这里需要实现启用功能
-      ElMessage.success('启用成功')
-      queryPage()
-    }).catch(() => {
-      ElMessage.info('取消启用')
+      ElMessage.info(`取消${statusText}`)
     })
 }
 </script>
@@ -235,7 +239,11 @@ const enableUser = async (id) => {
     <!-- 列表展示 -->
     <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
       <el-table-column type="selection"  align="center" width="35" />
-      <el-table-column prop="id" label="ID" align="center" width="50px" />
+      <el-table-column label="ID" align="center" width="50px">
+        <template #default="scope">
+          {{ scope.row.autoId }}
+        </template>
+      </el-table-column>
       <el-table-column prop="username" label="用户名" align="center" width="100px" />
       <el-table-column prop="email" label="邮箱" align="center" width="200px"/>
       <el-table-column prop="phone" label="手机号" align="center" width="130px"/>
@@ -248,8 +256,8 @@ const enableUser = async (id) => {
         <template #default="scope">
           <el-button type="primary" size="small" @click="updateStu(scope.row.id) ;resetForm(stuFormRef)">编辑</el-button>
           <el-button type="danger" size="small" @click="delById(scope.row.id)">删除</el-button>
-          <el-button v-if="scope.row.status == 1" type="warning" size="small" @click="disableUser(scope.row.id)">禁用</el-button>
-          <el-button v-else type="success" size="small" @click="enableUser(scope.row.id)">启用</el-button>
+          <el-button v-if="scope.row.status == 1" type="warning" size="small" @click="updateUserStatus(scope.row.id, 0)">禁用</el-button>
+          <el-button v-else type="success" size="small" @click="updateUserStatus(scope.row.id, 1)">启用</el-button>
         </template>
       </el-table-column>
     </el-table>

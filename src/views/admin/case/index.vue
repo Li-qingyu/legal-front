@@ -18,6 +18,16 @@ onMounted(() => {
   queryAllLegalTypes()
 })
 
+//监听搜索条件变化，当搜索条件变为空时自动更新页面数据
+watch(searchClazz, (newVal, oldVal) => {
+  if ((!newVal.name || newVal.name === '') && 
+      (!newVal.typeId || newVal.typeId === '') && 
+      (!newVal.tag || newVal.tag === '') &&
+      (oldVal.name || oldVal.typeId || oldVal.tag)) {
+    queryPage()
+  }
+}, { deep: true })
+
 //所有的法律类型数据
 const queryAllLegalTypes = async () => {
   let result = await queryAllLegalTypeApi()
@@ -50,7 +60,11 @@ const queryPage = async () => {
   );
 
   if(result.code) {
-    tableData.value = result.data.rows
+    // 为每条数据添加自增ID
+    tableData.value = result.data.rows.map((item, index) => ({
+      ...item,
+      autoId: (pagination.value.currentPage - 1) * pagination.value.pageSize + index + 1
+    }))
     pagination.value.total = result.data.total
   }
 }
@@ -332,7 +346,11 @@ const unpublishCase = async (id) => {
     <!-- 列表展示 -->
     <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
       <el-table-column type="selection"  align="center" width="35" />
-      <el-table-column type="index" label="ID" width="55" align="center"/>
+      <el-table-column label="ID" width="55" align="center">
+        <template #default="scope">
+          {{ scope.row.autoId }}
+        </template>
+      </el-table-column>
       <el-table-column prop="cover" label="封面" align="center" width="80px">
         <template #default="scope">
           <img v-if="scope.row.cover" :src="scope.row.cover" style="width: 60px; height: 40px; object-fit: cover;" />
