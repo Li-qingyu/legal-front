@@ -218,8 +218,8 @@ const openImportDialog = () => {
   importFile.value = null
 }
 
-const handleFileChange = (event) => {
-  importFile.value = event.target.files[0]
+const handleFileChange = (file) => {
+  importFile.value = file.raw
 }
 
 const importLawArticles = async () => {

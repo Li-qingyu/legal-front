@@ -18,6 +18,10 @@ request.interceptors.request.use(
     // if (loginUser&&loginUser.token) {
     //   config.headers.token = loginUser.token;
     // }
+    // 对于FormData对象，不设置Content-Type，让axios自动处理
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+    }
     return config
   },
   (error) => { //失败回调

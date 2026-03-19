@@ -14,14 +14,7 @@ export const queryAllApi = () => {
 
 // 根据ID查询法律类型
 export const queryIdApi = (id) => {
-  return Promise.resolve({
-    code: true,
-    data: {
-      id: id,
-      name: '民事法律',
-      description: '涉及公民之间的权利义务关系'
-    }
-  });
+  return request.get(`/admin/types/${id}`);
 };
 
 // 添加法律类型
