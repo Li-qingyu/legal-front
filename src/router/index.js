@@ -8,6 +8,7 @@ import CaseView from '@/views/admin/case/index.vue'
 import TypeView from '@/views/admin/type/index.vue'
 import UserView from '@/views/admin/user/index.vue'
 import LawArticleView from '@/views/admin/law-article/index.vue'
+import LawBookView from '@/views/admin/law-book/index.vue'
 import LayoutView from '@/views/admin/layout/index.vue'
 import IndexView from '@/views/admin/index/index.vue'
 
@@ -34,6 +35,7 @@ const router = createRouter({
         { path: 'user', name: 'user', component: UserView },
         { path: 'type', name: 'type', component: TypeView },
         { path: 'law-article', name: 'law-article', component: LawArticleView },
+        { path: 'law-book', name: 'law-book', component: LawBookView },
       ]
     },
     { path: '/login', name: 'login', component: LoginView },

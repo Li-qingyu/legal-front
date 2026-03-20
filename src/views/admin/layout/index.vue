@@ -53,6 +53,7 @@ const logout=()=>{
               </template>
                 <el-menu-item index="/admin/case"><el-icon><HelpFilled /></el-icon>法律案例管理</el-menu-item>
                 <el-menu-item index="/admin/type"><el-icon><HelpFilled /></el-icon>法律类型管理</el-menu-item>
+                <el-menu-item index="/admin/law-book"><el-icon><InfoFilled /></el-icon>法律书管理</el-menu-item>
                 <el-menu-item index="/admin/law-article"><el-icon><InfoFilled /></el-icon>法律条文管理</el-menu-item>
                 <el-menu-item index="/admin/user"><el-icon><UserFilled /></el-icon>用户管理</el-menu-item>
 

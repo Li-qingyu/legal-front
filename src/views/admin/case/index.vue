@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi} from '@/api/case'
+import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, batchToggleStatusApi} from '@/api/case'
 import { queryAllApi as queryAllLegalTypeApi } from '@/api/type'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -61,7 +61,7 @@ const queryPage = async () => {
 
   if(result.code) {
     // 为每条数据添加自增ID
-    tableData.value = result.data.rows.map((item, index) => ({
+    tableData.value = (result.data.rows || result.data.records || []).map((item, index) => ({
       ...item,
       autoId: (pagination.value.currentPage - 1) * pagination.value.pageSize + index + 1
     }))
@@ -81,35 +81,36 @@ const handleSelectionChange = (selection) => {
   selectIds.value = selection.map(item => item.id)
 }
 
-//批量上架
-const batchPublish = async () => {
+//批量切换状态
+const batchToggleStatus = async () => {
   if(selectIds.value.length === 0) {
-    ElMessage.warning('请选择要上架的案例')
+    ElMessage.warning('请选择要操作的案例')
     return
   }
-  ElMessageBox.confirm('您确认批量上架选中的案例吗?' , '批量上架', {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
-    .then(async () => {
-      // 这里需要实现上架功能
-      ElMessage.success('上架成功')
-      queryPage()
-    }).catch(() => {
-      ElMessage.info('取消上架')
-    })
-}
-
-//批量下架
-const batchUnpublish = async () => {
-  if(selectIds.value.length === 0) {
-    ElMessage.warning('请选择要下架的案例')
+  
+  // 检查选中案例的状态，决定是上架还是下架
+  const selectedItems = tableData.value.filter(item => selectIds.value.includes(item.id))
+  if(selectedItems.length === 0) {
+    ElMessage.warning('请选择要操作的案例')
     return
   }
-  ElMessageBox.confirm('您确认批量下架选中的案例吗?' , '批量下架', {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
+  
+  // 假设所有选中的案例状态相同，取第一个案例的状态
+  const currentStatus = selectedItems[0].status
+  const newStatus = currentStatus === 1 ? 0 : 1
+  const operationText = newStatus === 1 ? '上架' : '下架'
+  
+  ElMessageBox.confirm(`您确认批量${operationText}选中的案例吗?` , `批量${operationText}`, {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
     .then(async () => {
-      // 这里需要实现下架功能
-      ElMessage.success('下架成功')
-      queryPage()
+      const result = await batchToggleStatusApi(selectIds.value, newStatus)
+      if(result.code) {
+        ElMessage.success(`${operationText}成功`)
+        queryPage()
+      } else {
+        ElMessage.error(result.msg)
+      }
     }).catch(() => {
-      ElMessage.info('取消下架')
+      ElMessage.info(`取消${operationText}`)
     })
 }
 
@@ -129,9 +130,10 @@ let clazz = ref({
 })
 
 // 文件上传相关
-const uploadUrl = '/api/upload'; // 这里需要替换为实际的上传接口
+const uploadUrl = '/api/upload'; // 上传接口
 const uploadHeaders = ref({}); // 上传时的请求头
 const uploadDisabled = ref(false); // 是否禁用上传
+const fileList = ref([]); // 上传文件列表
 
 // 上传前的钩子函数
 const handleBeforeUpload = (file) => {
@@ -154,8 +156,13 @@ const handleBeforeUpload = (file) => {
 const handleUploadSuccess = (response, uploadFile) => {
   // 这里根据实际的上传接口返回格式来处理
   // 假设返回格式为 { code: 200, data: { url: '图片URL' } }
+  // 注意：由于响应拦截器已经返回了response.data，所以这里的response已经是后端返回的数据
+  console.log('上传成功响应:', response);
   if (response.code) {
-    clazz.value.cover = response.data.url;
+    const imageUrl = response.data?.url || response.url || response.data;
+    clazz.value.cover = imageUrl;
+    fileList.value = [{ name: uploadFile.name, url: imageUrl }];
+    console.log('设置的cover值:', clazz.value.cover);
     ElMessage.success('图片上传成功');
   } else {
     ElMessage.error('图片上传失败');
@@ -170,6 +177,8 @@ const handleUploadError = (error, uploadFile) => {
 // 移除图片的回调函数
 const handleRemove = (file, fileList) => {
   clazz.value.cover = '';
+  fileList.value = [];
+  console.log('图片已移除');
 };
 
 // 预览图片
@@ -188,6 +197,8 @@ const clearClazz = () => {
     cover: '',
     status: '1'
   }
+  fileList.value = [];
+  console.log('表单已清空');
 }
 
 //新增法律案例
@@ -210,6 +221,10 @@ const updateClazz = async (id) => {
       ...data,
       status: data.status.toString() // 将数字转换为字符串
     };
+    // 初始化fileList
+    if(data.cover) {
+      fileList.value = [{ name: 'cover', url: data.cover }];
+    }
   }
 }
 
@@ -243,6 +258,7 @@ const save = (clazzForm) => {
   if(!clazzForm) return
   clazzForm.validate(async (valid) => {
     if(valid) {
+      console.log('保存的案例数据:', clazz.value);
       let api 
       if(clazz.value.id) {
         api = updateApi(clazz.value)
@@ -282,27 +298,22 @@ const delById = async (id) => {
     })
 }
 
-//发布案例
-const publishCase = async (id) => {
-  ElMessageBox.confirm('您确认发布此法律案例吗?' , '发布案例', {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
+//切换案例状态
+const toggleCaseStatus = async (id, currentStatus) => {
+  const newStatus = currentStatus === 1 ? 0 : 1
+  const operationText = newStatus === 1 ? '发布' : '下架'
+  
+  ElMessageBox.confirm(`您确认${operationText}此法律案例吗?` , `${operationText}案例`, {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
     .then(async () => {
-      // 这里需要实现发布功能
-      ElMessage.success('发布成功')
-      queryPage()
+      const result = await batchToggleStatusApi([id], newStatus)
+      if(result.code) {
+        ElMessage.success(`${operationText}成功`)
+        queryPage()
+      } else {
+        ElMessage.error(result.msg)
+      }
     }).catch(() => {
-      ElMessage.info('取消发布')
-    })
-}
-
-//下架案例
-const unpublishCase = async (id) => {
-  ElMessageBox.confirm('您确认下架此法律案例吗?' , '下架案例', {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
-    .then(async () => {
-      // 这里需要实现下架功能
-      ElMessage.success('下架成功')
-      queryPage()
-    }).catch(() => {
-      ElMessage.info('取消下架')
+      ElMessage.info(`取消${operationText}`)
     })
 }
 </script>
@@ -339,8 +350,7 @@ const unpublishCase = async (id) => {
     
     <!-- 功能按钮 -->
     <el-button type="success" @click="addClazz();resetForm(clazzFormRef)">添加法律案例</el-button>
-    <el-button type="primary" @click="batchPublish()">批量上架</el-button>
-    <el-button type="warning" @click="batchUnpublish()">批量下架</el-button>
+    <el-button type="primary" @click="batchToggleStatus()">批量操作</el-button>
     <br><br>
     
     <!-- 列表展示 -->
@@ -370,8 +380,7 @@ const unpublishCase = async (id) => {
         <template #default="scope">
           <el-button type="primary" size="small" @click="updateClazz(scope.row.id); resetForm(clazzFormRef)">编辑</el-button>
           <el-button type="danger" size="small" @click="delById(scope.row.id)">删除</el-button>
-          <el-button v-if="scope.row.status == 1" type="warning" size="small" @click="unpublishCase(scope.row.id)">下架</el-button>
-          <el-button v-else type="success" size="small" @click="publishCase(scope.row.id)">发布</el-button>
+          <el-button :type="scope.row.status == 1 ? 'warning' : 'success'" size="small" @click="toggleCaseStatus(scope.row.id, scope.row.status)">{{ scope.row.status == 1 ? '下架' : '发布' }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -419,17 +428,16 @@ const unpublishCase = async (id) => {
           :headers="uploadHeaders"
           :disabled="uploadDisabled"
           :show-file-list="true"
+          :file-list="fileList"
           :on-before-upload="handleBeforeUpload"
           :on-success="handleUploadSuccess"
           :on-error="handleUploadError"
           :on-remove="handleRemove"
           :on-preview="handlePictureCardPreview"
-          :file-list="[]"
           list-type="picture-card"
           accept="image/*"
         >
           <el-icon v-if="!clazz.cover"><Plus /></el-icon>
-          <img v-else :src="clazz.cover" class="avatar" style="width: 100%; height: 100%; object-fit: cover;" />
         </el-upload>
         <el-button v-if="clazz.cover" type="danger" size="small" @click="clazz.cover = ''">移除图片</el-button>
       </el-form-item>
