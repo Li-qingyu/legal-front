@@ -1,24 +1,28 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, importApi} from '@/api/law-article'
+import { getAllLawBooksApi } from '@/api/law-book'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 
 
 //搜索表单对象
-let searchStu = ref({bookTitle: '', articleTitle: ''}) 
+let searchStu = ref({lawBookId: '', articleTitle: ''}) 
 //列表展示数据
 let tableData = ref([])
+//法律书列表
+let lawBookList = ref([])
 
 //钩子函数 - 页面加载时触发
 onMounted(() => {
   queryPage()
+  getLawBookList()
 })
 
 //监听搜索条件变化，当搜索条件变为空时自动更新页面数据
 watch(searchStu, (newVal, oldVal) => {
-  if ((!newVal.bookTitle || newVal.bookTitle === '') && 
+  if ((!newVal.lawBookId || newVal.lawBookId === '') && 
       (!newVal.articleTitle || newVal.articleTitle === '') && 
-      (oldVal.bookTitle || oldVal.articleTitle)) {
+      (oldVal.lawBookId || oldVal.articleTitle)) {
     queryPage()
   }
 }, { deep: true })
@@ -45,7 +49,7 @@ const handleCurrentChange = (page) => {
 //分页条件查询
 const queryPage = async () => {
   const result = await queryPageApi(
-      searchStu.value.bookTitle,
+      searchStu.value.lawBookId,
       searchStu.value.articleTitle,
       pagination.value.currentPage,
       pagination.value.pageSize
@@ -63,8 +67,20 @@ const queryPage = async () => {
 
 //清空搜索栏
 const clear = () => {
-  searchStu.value = {bookTitle: '', articleTitle: ''}
+  searchStu.value = {lawBookId: '', articleTitle: ''}
   queryPage()
+}
+
+//获取法律书列表
+const getLawBookList = async () => {
+  try {
+    const result = await getAllLawBooksApi()
+    if (result.code) {
+      lawBookList.value = result.data
+    }
+  } catch (error) {
+    ElMessage.error('获取法律书列表失败')
+  }
 }
 
 
@@ -74,6 +90,7 @@ let labelWidth = ref(120) //form表单label的宽度
 let formTitle = ref('') //表单的标题
 let stu = ref({ //法律条文对象-表单数据绑定
   id: '',
+  lawBookId: '',
   bookTitle: '',
   articleTitle: '',
   content: '',
@@ -85,6 +102,7 @@ let stu = ref({ //法律条文对象-表单数据绑定
 const clearStu = () => {
   stu.value = {
     id: '',
+    lawBookId: '',
     bookTitle: '',
     articleTitle: '',
     content: '',
@@ -113,15 +131,19 @@ const updateStu = async (id) => {
       publishDate: data.publishDate ? data.publishDate.substring(0, 10) : '',
       effectiveDate: data.effectiveDate ? data.effectiveDate.substring(0, 10) : ''
     };
+    // 查找对应的法律书ID
+    const lawBook = lawBookList.value.find(book => book.name === data.bookTitle)
+    if (lawBook) {
+      stu.value.lawBookId = lawBook.id
+    }
   }
 }
 
 //表单校验规则
 const stuFormRef = ref()
 const rules = ref({
-  bookTitle: [
-    { required: true, message: '法律书标题为必填项', trigger: 'blur' },
-    { min: 2, max: 200, message: '法律书标题长度为2-200个字', trigger: 'blur' }
+  lawBookId: [
+    { required: true, message: '请选择法律书', trigger: 'blur' }
   ],
   articleTitle: [
     { required: true, message: '法律条文标题为必填项', trigger: 'blur' },
@@ -150,6 +172,12 @@ const save = (stuForm) => {
   if(!stuForm) return
   stuForm.validate(async (valid) => {
     if(valid) {
+      // 根据选择的法律书ID获取法律书名称
+      const selectedLawBook = lawBookList.value.find(book => book.id === stu.value.lawBookId)
+      if (selectedLawBook) {
+        stu.value.bookTitle = selectedLawBook.name
+      }
+      
       let api 
       if(stu.value.id) {
         api = updateApi(stu.value)
@@ -212,10 +240,12 @@ const delByIds = async () => {
 //------- 批量导入法律条文
 const importDialogVisible = ref(false)
 const importFile = ref(null)
+const selectedLawBookId = ref('')
 
 const openImportDialog = () => {
   importDialogVisible.value = true
   importFile.value = null
+  selectedLawBookId.value = ''
 }
 
 const handleFileChange = (file) => {
@@ -223,6 +253,10 @@ const handleFileChange = (file) => {
 }
 
 const importLawArticles = async () => {
+  if (!selectedLawBookId.value) {
+    ElMessage.warning('请选择法律书')
+    return
+  }
   if (!importFile.value) {
     ElMessage.warning('请选择要导入的文件')
     return
@@ -237,6 +271,7 @@ const importLawArticles = async () => {
   try {
     const formData = new FormData()
     formData.append('file', importFile.value)
+    formData.append('lawBookId', selectedLawBookId.value)
     
     const result = await importApi(formData)
     if (result.code) {
@@ -262,8 +297,16 @@ const importLawArticles = async () => {
 
     <!-- 条件搜索表单 -->
     <el-form :inline="true" :model="searchStu" class="demo-form-inline">
-      <el-form-item label="法律书标题">
-        <el-input v-model="searchStu.bookTitle" placeholder="搜索法律书标题..."/>
+      <el-form-item label="法律书">
+        <el-select v-model="searchStu.lawBookId" placeholder="选择法律书" style="width: 200px">
+          <el-option label="全部" value="" />
+          <el-option
+            v-for="lawBook in lawBookList"
+            :key="lawBook.id"
+            :label="lawBook.name"
+            :value="lawBook.id"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="法律条文标题">
@@ -327,8 +370,15 @@ const importLawArticles = async () => {
         <!-- 第一行 -->
         <el-row>
           <el-col :span="24">
-            <el-form-item label="法律书标题" :label-width="labelWidth" prop="bookTitle">
-              <el-input v-model="stu.bookTitle" placeholder="请输入法律书标题" style="width: 100%" size="default"/>
+            <el-form-item label="法律书" :label-width="labelWidth" prop="lawBookId">
+              <el-select v-model="stu.lawBookId" placeholder="请选择法律书" style="width: 100%">
+                <el-option
+                  v-for="lawBook in lawBookList"
+                  :key="lawBook.id"
+                  :label="lawBook.name"
+                  :value="lawBook.id"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -396,6 +446,16 @@ const importLawArticles = async () => {
     <!-- 批量导入对话框 -->
     <el-dialog v-model="importDialogVisible" title="批量导入法律条文" width="50%">
       <el-form>
+        <el-form-item label="法律书">
+          <el-select v-model="selectedLawBookId" placeholder="请选择法律书" style="width: 100%">
+            <el-option
+              v-for="lawBook in lawBookList"
+              :key="lawBook.id"
+              :label="lawBook.name"
+              :value="lawBook.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="上传文件">
           <el-upload
             class="upload-demo"
@@ -407,7 +467,7 @@ const importLawArticles = async () => {
             <el-button type="primary">选择文件</el-button>
             <template #tip>
               <div class="el-upload__tip">
-                请上传Excel文件，格式要求：法律书标题、法律条文标题、条文内容、发布日期、生效日期
+                请上传Excel文件，格式要求：法律条文标题、条文内容、发布日期、生效日期
               </div>
             </template>
           </el-upload>

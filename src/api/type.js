@@ -2,14 +2,7 @@ import request from "@/utils/request";
 
 // 查询所有法律类型
 export const queryAllApi = () => {
-  return Promise.resolve({
-    code: true,
-    data: [
-      { id: 1, name: '民事法律', description: '涉及公民之间的权利义务关系', updateTime: '2026-03-12 10:00:00' },
-      { id: 2, name: '刑事法律', description: '涉及犯罪和刑罚的法律', updateTime: '2026-03-12 10:00:00' },
-      { id: 3, name: '行政法律', description: '涉及行政机关和公民之间的关系', updateTime: '2026-03-12 10:00:00' }
-    ]
-  });
+  return request.get('/admin/types/list');
 };
 
 // 根据ID查询法律类型

@@ -1,12 +1,12 @@
 import request from '@/utils/request'
 
 // 分页查询法律条文
-export const queryPageApi = (bookTitle, articleTitle, currentPage, pageSize) => {
+export const queryPageApi = (lawBookId, articleTitle, currentPage, pageSize) => {
   return request({
     url: '/admin/law-articles',
     method: 'get',
     params: {
-      bookTitle,
+      lawBookId,
       articleTitle,
       page: currentPage,
       pageSize

@@ -35,3 +35,8 @@ export const deleteApi = (id) => {
     method: 'delete'
   });
 };
+
+// 获取所有法律书列表
+export const getAllLawBooksApi = () => {
+  return request.get('/admin/law-books/all');
+};
