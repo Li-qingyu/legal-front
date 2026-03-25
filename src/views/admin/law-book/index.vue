@@ -158,11 +158,22 @@ const save = (stuForm) => {
 
 
 //------- 删除法律书
-//根据ID删除单个法律书
-const delById = async (id) => {
-  ElMessageBox.confirm('您确认删除此法律书吗?' , '删除法律书', {confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'})
+//删除法律书（支持单个删除和批量删除）
+const deleteLawBook = async (ids) => {
+  // 如果传入的是单个ID，转换为数组
+  const deleteIds = Array.isArray(ids) ? ids : [ids]
+  
+  if (deleteIds.length === 0) {
+    ElMessage.warning('请选择要删除的法律书')
+    return
+  }
+  
+  const confirmMessage = deleteIds.length === 1 ? '您确认删除此法律书吗?' : '您确认删除选中的法律书吗?'
+  const confirmTitle = deleteIds.length === 1 ? '删除法律书' : '批量删除'
+  
+  ElMessageBox.confirm(confirmMessage, confirmTitle, {confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'})
     .then(async () => {
-      let result =  await deleteApi(`${id}`)
+      let result = await deleteApi(deleteIds.join(','))
       if(result.code) {
         ElMessage.success('删除成功')
         queryPage()
@@ -174,24 +185,14 @@ const delById = async (id) => {
     })
 }
 
+//根据ID删除单个法律书
+const delById = async (id) => {
+  await deleteLawBook(id)
+}
+
 //批量删除法律书
 const delByIds = async () => {
-  if (selectIds.value.length === 0) {
-    ElMessage.warning('请选择要删除的法律书')
-    return
-  }
-  ElMessageBox.confirm('您确认删除选中的法律书吗?' , '批量删除', {confirmButtonText:'确认', cancelButtonText:'取消',type:'warning'})
-    .then(async () => {
-      let result =  await deleteApi(selectIds.value.join(','))
-      if(result.code) {
-        ElMessage.success('删除成功')
-        queryPage()
-      }else {
-        ElMessage.error(result.msg)
-      }
-    }).catch(() => {
-      ElMessage.info('取消删除')
-    })
+  await deleteLawBook(selectIds.value)
 }
 </script>
 

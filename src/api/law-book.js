@@ -29,9 +29,9 @@ export const updateApi = (data) => {
 };
 
 // 删除法律书
-export const deleteApi = (id) => {
+export const deleteApi = (ids) => {
   return request({
-    url: `/admin/law-books/${id}`,
+    url: `/admin/law-books/${ids}`,
     method: 'delete'
   });
 };
