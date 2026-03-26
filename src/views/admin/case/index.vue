@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, batchToggleStatusApi} from '@/api/case'
-import { queryAllApi as queryAllLegalTypeApi } from '@/api/type'
+import { queryAllApi1 as queryAllLegalTypeApi } from '@/api/type'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 

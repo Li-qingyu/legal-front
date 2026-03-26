@@ -11,11 +11,12 @@
             class="search-input"
             prefix-icon="el-icon-search"
           />
-          <el-button type="primary" class="search-btn">搜索</el-button>
+          <el-button type="primary" class="search-btn" @click="handleSearch">搜索</el-button>
         </div>
         <div class="nav-links">
           <router-link to="/" class="nav-link">首页</router-link>
           <router-link to="/case" class="nav-link">法律案例</router-link>
+          <router-link to="/law" class="nav-link">法典</router-link>
           <router-link to="/ai" class="nav-link">AI法律咨询</router-link>
           <router-link to="/collection" class="nav-link">案例收藏</router-link>
           <router-link to="/login" class="nav-link">退出登录</router-link>
@@ -27,11 +28,19 @@
     <main class="main-content">
       <!-- 轮播图 -->
       <el-carousel :interval="5000" type="card" height="400px" class="carousel">
-        <el-carousel-item>
+        <el-carousel-item v-for="(item, index) in carouselData" :key="index">
+          <div class="carousel-content">
+            <h1 class="carousel-title">{{ item.title }}</h1>
+            <p class="carousel-subtitle">{{ item.subtitle }}</p>
+            <router-link to="/ai"><el-button type="primary" size="large" class="carousel-btn">{{ item.buttonText }}</el-button></router-link>
+          </div>
+        </el-carousel-item>
+        <!-- 默认轮播图，当API未返回数据时显示 -->
+        <el-carousel-item v-if="carouselData.length === 0">
           <div class="carousel-content">
             <h1 class="carousel-title">专业法律咨询服务</h1>
             <p class="carousel-subtitle">AI驱动的智能法律助手，为您提供专业、便捷的法律咨询</p>
-            <el-button type="primary" size="large" class="carousel-btn">立即咨询</el-button>
+            <router-link to="/ai"><el-button type="primary" size="large" class="carousel-btn">立即咨询</el-button></router-link>
           </div>
         </el-carousel-item>
       </el-carousel>
@@ -79,7 +88,7 @@
                 我们的AI法律助手基于Spring AI框架，结合阿里云百炼平台的Qwen模型，
                 能够查询数据库中的相关法律案例和法律知识，为您提供专业、准确的法律回答。
               </p>
-              <el-button type="primary" size="large" class="ai-btn">开始咨询</el-button>
+              <router-link to="/ai"><el-button type="primary" size="large" class="ai-btn">开始咨询</el-button></router-link>
             </el-col>
             <el-col :xs="24" :md="12" class="ai-image">
               <el-image
@@ -115,6 +124,7 @@
             <ul>
               <li><router-link to="/">首页</router-link></li>
               <li><router-link to="/case">法律案例</router-link></li>
+              <li><router-link to="/law">法典</router-link></li>
               <li><router-link to="/ai">AI法律咨询</router-link></li>
               <li><router-link to="/collection">案例收藏</router-link></li>
             </ul>
@@ -129,51 +139,67 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { getCarouselApi, getHotCasesApi, getLawsApi, searchLawContentApi } from '@/api/home';
 
 const activeIndex = ref('/');
 const searchQuery = ref('');
 
-const cases = [
-  {
-    title: '劳动合同纠纷案例',
-    summary: '王某与某公司因劳动合同解除产生纠纷，最终通过法律途径维护了自身权益。',
-    date: '2026-03-01'
-  },
-  {
-    title: '房产继承纠纷案例',
-    summary: '李某与兄弟姐妹因房产继承问题产生争议，通过调解达成一致意见。',
-    date: '2026-02-28'
-  },
-  {
-    title: '交通事故赔偿案例',
-    summary: '张某因交通事故受伤，通过法律途径获得了合理的赔偿。',
-    date: '2026-02-25'
-  }
-];
+// 数据状态
+const carouselData = ref([]);
+const cases = ref([]);
+const laws = ref([]);
+const loading = ref(false);
+const error = ref('');
 
-const laws = [
-  {
-    title: '中华人民共和国民法典',
-    publishDate: '2020-05-28',
-    effectiveDate: '2021-01-01'
-  },
-  {
-    title: '中华人民共和国刑法',
-    publishDate: '2020-12-26',
-    effectiveDate: '2021-03-01'
-  },
-  {
-    title: '中华人民共和国劳动合同法',
-    publishDate: '2012-12-28',
-    effectiveDate: '2013-07-01'
-  },
-  {
-    title: '中华人民共和国婚姻法',
-    publishDate: '2001-04-28',
-    effectiveDate: '2001-04-28'
+// 初始化数据
+onMounted(async () => {
+  await loadHomeData();
+});
+
+// 加载首页数据
+async function loadHomeData() {
+  loading.value = true;
+  error.value = '';
+  
+  try {
+    // 获取轮播图数据
+    const carouselResponse = await getCarouselApi();
+    carouselData.value = carouselResponse.data || [];
+    
+    // 获取热门案例
+    const casesResponse = await getHotCasesApi();
+    cases.value = casesResponse.data?.list || [];
+    
+    // 获取法律条文
+    const lawsResponse = await getLawsApi();
+    laws.value = lawsResponse.data?.list || [];
+  } catch (err) {
+    error.value = '数据加载失败，请刷新页面重试';
+    console.error('加载首页数据失败:', err);
+  } finally {
+    loading.value = false;
   }
-];
+}
+
+// 搜索
+async function handleSearch() {
+  if (!searchQuery.value) return;
+  
+  loading.value = true;
+  
+  try {
+    const response = await searchLawContentApi(searchQuery.value);
+    // 处理搜索结果
+    console.log('搜索结果:', response.data);
+    // 可以根据需要跳转到搜索结果页面或在当前页面显示结果
+  } catch (err) {
+    error.value = '搜索失败，请重试';
+    console.error('搜索失败:', err);
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <style scoped>

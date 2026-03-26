@@ -23,7 +23,7 @@ watch(searchKeyword, (newVal, oldVal) => {
 
 //查询
 const search = async()=>{
-  const result =await queryAllApi();
+  const result =await queryAllApi(searchKeyword.value);
   if(result.code){
     // 为每条数据添加自增ID
     deptList.value=result.data.map((item, index) => ({

@@ -1,112 +1,139 @@
--- 数据库建表语句
+create table ai_consultation
+(
+    id          int auto_increment comment '主键ID'
+        primary key,
+    user_id     int                                not null comment '用户ID（逻辑外键）',
+    question    text                               not null comment '问题',
+    answer      text                               not null comment '回答',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '咨询时间'
+)
+    comment 'AI咨询记录表' charset = utf8mb4;
 
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS `law_consultation` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+create index idx_user_id
+    on ai_consultation (user_id);
 
-USE `law_consultation`;
+create table case_collection
+(
+    id          int auto_increment comment '主键ID'
+        primary key,
+    user_id     int                                not null comment '用户ID（逻辑外键）',
+    case_id     int                                not null comment '案例ID（逻辑外键）',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '收藏时间',
+    constraint uk_user_case
+        unique (user_id, case_id)
+)
+    comment '案例收藏表' charset = utf8mb4;
 
--- 法律类型表
-CREATE TABLE IF NOT EXISTS `law_type` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '类型名称',
-  `description` VARCHAR(255) NOT NULL COMMENT '类型描述',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='法律类型表';
+create table law_article
+(
+    id             int auto_increment comment '主键ID'
+        primary key,
+    book_id        int                                null comment '法律书ID（逻辑外键）',
+    article_title  varchar(200)                       not null comment '法律条文标题',
+    content        text                               not null comment '条文内容',
+    publish_date   date                               not null comment '发布日期',
+    effective_date date                               not null comment '生效日期',
+    create_time    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time    datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '法律条文表' charset = utf8mb4;
 
--- 法律案例表
-CREATE TABLE IF NOT EXISTS `law_case` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `title` VARCHAR(100) NOT NULL COMMENT '案例标题',
-  `type_id` INT(11) NOT NULL COMMENT '法律类型ID（逻辑外键）',
-  `tags` VARCHAR(100) NOT NULL COMMENT '标签，多个标签用逗号分隔',
-  `content` TEXT NOT NULL COMMENT '案例内容',
-  `cover` VARCHAR(255) DEFAULT NULL COMMENT '封面图片URL',
-  `publish_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
-  `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1-发布，0-下架',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_type_id` (`type_id`),
-  KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='法律案例表';
+create index idx_book_id
+    on law_article (book_id);
 
--- 用户表
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `username` VARCHAR(50) NOT NULL COMMENT '用户名',
-  `password` VARCHAR(100) NOT NULL COMMENT '密码（加密存储）',
-  `nickname` VARCHAR(50) NOT NULL COMMENT '昵称',
-  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
-  `phone` VARCHAR(20) NOT NULL COMMENT '手机号',
-  `role` INT(11) NOT NULL DEFAULT 0 COMMENT '角色：1-管理员，0-普通用户',
-  `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1-启用，0-禁用',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`),
-  UNIQUE KEY `uk_email` (`email`),
-  UNIQUE KEY `uk_phone` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+create table law_book
+(
+    id             int auto_increment comment '主键ID'
+        primary key,
+    name           varchar(200)                       not null comment '法律书名称',
+    publish_date   date                               not null comment '发布日期',
+    effective_date date                               not null comment '生效日期',
+    create_time    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time    datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '法律书表' charset = utf8mb4;
 
--- 案例收藏表
-CREATE TABLE IF NOT EXISTS `case_collection` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` INT(11) NOT NULL COMMENT '用户ID（逻辑外键）',
-  `case_id` INT(11) NOT NULL COMMENT '案例ID（逻辑外键）',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_case` (`user_id`, `case_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='案例收藏表';
+create index idx_name
+    on law_book (name);
 
--- AI咨询记录表
-CREATE TABLE IF NOT EXISTS `ai_consultation` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` INT(11) NOT NULL COMMENT '用户ID（逻辑外键）',
-  `question` TEXT NOT NULL COMMENT '问题',
-  `answer` TEXT NOT NULL COMMENT '回答',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '咨询时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI咨询记录表';
+create table law_case
+(
+    id           int auto_increment comment '主键ID'
+        primary key,
+    title        varchar(100)                         not null comment '案例标题',
+    type_id      int                                  not null comment '法律类型ID（逻辑外键）',
+    tags         varchar(100)                         not null comment '标签，多个标签用逗号分隔',
+    content      text                                 not null comment '案例内容',
+    cover        varchar(255)                         null comment '封面图片URL',
+    publish_time datetime   default CURRENT_TIMESTAMP not null comment '发布时间',
+    status       tinyint(1) default 1                 not null comment '状态：1-发布，0-下架',
+    create_time  datetime   default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time  datetime   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '法律案例表' charset = utf8mb4;
 
--- 法律条文表
-CREATE TABLE IF NOT EXISTS `law_article` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `book_title` VARCHAR(200) NOT NULL COMMENT '法律书标题',
-  `article_title` VARCHAR(200) NOT NULL COMMENT '法律条文标题',
-  `content` TEXT NOT NULL COMMENT '条文内容',
-  `publish_date` DATE NOT NULL COMMENT '发布日期',
-  `effective_date` DATE NOT NULL COMMENT '生效日期',
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_book_title` (`book_title`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='法律条文表';
+create index idx_status
+    on law_case (status);
 
--- 初始化数据
--- 法律类型
-INSERT INTO `law_type` (`name`, `description`) VALUES
-('民事法律', '涉及公民之间的权利义务关系'),
-('刑事法律', '涉及犯罪和刑罚的法律'),
-('行政法律', '涉及行政机关和公民之间的关系');
+create index idx_type_id
+    on law_case (type_id);
 
--- 用户
-INSERT INTO `user` (`username`, `password`, `nickname`, `email`, `phone`, `role`, `status`) VALUES
-('admin', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '管理员', 'admin@example.com', '13800138000', 1, 1),
-('user1', '$2a$10$e6X6y1hU2uV2e8Q7e9d8e7r6t5y4u3i2o1p0o9i8u7y6t5r4e3w2q1', '用户1', 'user1@example.com', '13800138001', 0, 1);
+create table law_type
+(
+    id          int auto_increment comment '主键ID'
+        primary key,
+    name        varchar(50)                        not null comment '类型名称',
+    description varchar(255)                       not null comment '类型描述',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    constraint uk_name
+        unique (name)
+)
+    comment '法律类型表' charset = utf8mb4;
 
--- 法律案例
-INSERT INTO `law_case` (`title`, `type_id`, `tags`, `content`, `cover`, `status`) VALUES
-('劳动合同纠纷案例', 1, '劳动合同,纠纷', '王某与某公司因劳动合同解除产生纠纷，最终通过法律途径维护了自身权益。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20case%20labor%20contract&image_size=square', 1),
-('房产继承纠纷案例', 1, '房产,继承', '李某与兄弟姐妹因房产继承问题产生争议，通过调解达成一致意见。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20case%20property%20inheritance&image_size=square', 1),
-('交通事故赔偿案例', 1, '交通事故,赔偿', '张某因交通事故受伤，通过法律途径获得了合理的赔偿。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20case%20traffic%20accident&image_size=square', 1);
+create table user
+(
+    id          int auto_increment comment '主键ID'
+        primary key,
+    username    varchar(50)                          not null comment '用户名',
+    password    varchar(100)                         not null comment '密码（加密存储）',
+    nickname    varchar(50)                          null comment '昵称',
+    email       varchar(100)                         not null comment '邮箱',
+    phone       varchar(20)                          not null comment '手机号',
+    role        int        default 0                 not null comment '角色：1-管理员，0-普通用户',
+    status      tinyint(1) default 1                 not null comment '状态：1-启用，0-禁用',
+    create_time datetime   default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time datetime   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    constraint uk_email
+        unique (email),
+    constraint uk_phone
+        unique (phone),
+    constraint uk_username
+        unique (username)
+)
+    comment '用户表' charset = utf8mb4;
 
--- 法律条文
-INSERT INTO `law_article` (`book_title`, `article_title`, `content`, `publish_date`, `effective_date`) VALUES
-('中华人民共和国民法典', '第一条', '为了保护民事主体的合法权益，调整民事关系，维护社会和经济秩序，适应中国特色社会主义发展要求，弘扬社会主义核心价值观，根据宪法，制定本法。', '2020-05-28', '2021-01-01'),
-('中华人民共和国劳动合同法', '第一条', '用人单位违反本法规定解除或者终止劳动合同，劳动者要求继续履行劳动合同的，用人单位应当继续履行；劳动者不要求继续履行劳动合同或者劳动合同已经不能继续履行的，用人单位应当依照本法第八十七条规定支付赔偿金。', '2012-12-28', '2013-07-01'),
-('中华人民共和国劳动合同法', '第八十七条', '用人单位违反本法规定解除或者终止劳动合同的，应当依照本法第四十七条规定的经济补偿标准的二倍向劳动者支付赔偿金。', '2012-12-28', '2013-07-01'),
-('中华人民共和国刑法', '第一条', '为了惩罚犯罪，保护人民，根据宪法，结合我国同犯罪作斗争的具体经验及实际情况，制定本法。', '2020-12-26', '2021-03-01');
+create table carousel
+(
+    id          bigint auto_increment comment '主键ID'
+        primary key,
+    title       varchar(255)                        not null comment '轮播图标题',
+    subtitle    varchar(500)                        not null comment '轮播图副标题',
+    button_text varchar(100)                        not null comment '按钮文本',
+    image_url   varchar(500)                        null comment '轮播图图片URL',
+    order_num   int         default 0               not null comment '排序序号',
+    status      tinyint(1)   default 1               not null comment '状态：1-启用，0-禁用',
+    create_time datetime    default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time datetime    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '轮播图表' charset = utf8mb4;
+
+create index idx_status
+    on carousel (status);
+
+-- 轮播图初始化数据
+insert into carousel (title, subtitle, button_text, image_url, order_num, status) values
+('专业法律咨询服务', 'AI驱动的智能法律助手，为您提供专业、便捷的法律咨询', '立即咨询', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20consultation%20service&image_size=landscape_16_9', 1, 1),
+('法律知识普及', '了解法律知识，维护自身权益', '了解更多', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20knowledge%20popularization&image_size=landscape_16_9', 2, 1),
+('在线法律咨询', '随时随地获取专业法律建议', '开始咨询', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=online%20legal%20consultation&image_size=landscape_16_9', 3, 1);
+

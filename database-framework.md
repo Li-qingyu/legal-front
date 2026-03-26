@@ -42,7 +42,7 @@
 | id | INT(11) | NOT NULL AUTO_INCREMENT PRIMARY KEY | 主键ID |
 | username | VARCHAR(50) | NOT NULL UNIQUE | 用户名 |
 | password | VARCHAR(100) | NOT NULL | 密码（加密存储） |
-| nickname | VARCHAR(50) | NOT NULL | 昵称 |
+| nickname | VARCHAR(50) | DEFAULT NULL | 昵称 |
 | email | VARCHAR(100) | NOT NULL UNIQUE | 邮箱 |
 | phone | VARCHAR(20) | NOT NULL UNIQUE | 手机号 |
 | role | INT(11) | NOT NULL DEFAULT 0 | 角色：1-管理员，0-普通用户 |
@@ -75,12 +75,25 @@
 
 **用途**：记录用户与AI法律助手的咨询对话，便于后续分析和参考。
 
-### 2.6 法律条文表（law_article）
+### 2.6 法律书表（law_book）
 
 | 字段名 | 数据类型 | 约束 | 描述 |
 | :--- | :--- | :--- | :--- |
 | id | INT(11) | NOT NULL AUTO_INCREMENT PRIMARY KEY | 主键ID |
-| book_title | VARCHAR(200) | NOT NULL | 法律书标题 |
+| name | VARCHAR(200) | NOT NULL | 法律书名称 |
+| publish_date | DATE | NOT NULL | 发布日期 |
+| effective_date | DATE | NOT NULL | 生效日期 |
+| create_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+| update_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
+
+**用途**：存储法律书信息，为法律条文提供分类依据。
+
+### 2.7 法律条文表（law_article）
+
+| 字段名 | 数据类型 | 约束 | 描述 |
+| :--- | :--- | :--- | :--- |
+| id | INT(11) | NOT NULL AUTO_INCREMENT PRIMARY KEY | 主键ID |
+| book_id | INT(11) | DEFAULT NULL | 法律书ID（逻辑外键） |
 | article_title | VARCHAR(200) | NOT NULL | 法律条文标题 |
 | content | TEXT | NOT NULL | 条文内容 |
 | publish_date | DATE | NOT NULL | 发布日期 |
@@ -90,6 +103,22 @@
 
 **用途**：存储法律条文信息，为AI咨询和用户查询提供法律依据。
 
+### 2.8 轮播图表（carousel）
+
+| 字段名 | 数据类型 | 约束 | 描述 |
+| :--- | :--- | :--- | :--- |
+| id | BIGINT(20) | NOT NULL AUTO_INCREMENT PRIMARY KEY | 主键ID |
+| title | VARCHAR(255) | NOT NULL | 轮播图标题 |
+| subtitle | VARCHAR(500) | NOT NULL | 轮播图副标题 |
+| button_text | VARCHAR(100) | NOT NULL | 按钮文本 |
+| image_url | VARCHAR(500) | DEFAULT NULL | 轮播图图片URL |
+| order_num | INT(11) | NOT NULL DEFAULT 0 | 排序序号 |
+| status | TINYINT(1) | NOT NULL DEFAULT 1 | 状态：1-启用，0-禁用 |
+| create_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+| update_time | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
+
+**用途**：存储首页轮播图信息，包括标题、副标题、按钮文本和图片URL等。
+
 ## 3. 数据库关系图
 
 ```mermaid
@@ -98,6 +127,7 @@ erDiagram
     user ||--o{ case_collection : collects
     law_case ||--o{ case_collection : is_collected
     user ||--o{ ai_consultation : asks
+    law_book ||--o{ law_article : contains
 ```
 
 ## 4. 数据库设计特点
@@ -140,6 +170,7 @@ erDiagram
 - **案例收藏DAO**：提供收藏的CRUD操作，以及根据用户ID查询收藏案例等功能。
 - **AI咨询记录DAO**：提供咨询记录的CRUD操作，以及根据用户ID查询咨询历史等功能。
 - **法律条文DAO**：提供法律条文的CRUD操作，以及根据关键词查询等功能。
+- **轮播图DAO**：提供轮播图的CRUD操作，以及查询启用状态的轮播图等功能。
 
 ## 7. 性能优化策略
 
