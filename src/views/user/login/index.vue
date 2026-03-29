@@ -155,12 +155,16 @@ import { loginApi } from '@/api/login';
   height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
+  background: url('https://yujinyu-ai.oss-cn-beijing.aliyuncs.com/5712e6616a226c045a0064ead2f6b15e.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 /* Left Section */
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, #1890ff, #096dd9);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -177,14 +181,17 @@ import { loginApi } from '@/api/login';
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmZmZmMTAiPjwvcmVjdD4KPC9zdmc+');
-  opacity: 0.1;
-  animation: moveBackground 20s linear infinite;
+  background: url('https://yujinyu-ai.oss-cn-beijing.aliyuncs.com/5712e6616a226c045a0064ead2f6b15e.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  animation: moveBackground 25s linear infinite;
+  z-index: -1;
 }
 
 @keyframes moveBackground {
   0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+  100% { transform: translate(60px, 60px); }
 }
 
 .left-content {
@@ -286,12 +293,13 @@ import { loginApi } from '@/api/login';
 /* Right Section */
 .login-right {
   flex: 1;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px;
-  background-color: #f5f7fa;
   position: relative;
+  overflow: hidden;
 }
 
 .login-right::before {
@@ -299,19 +307,22 @@ import { loginApi } from '@/api/login';
   position: absolute;
   top: 0;
   right: 0;
-  width: 300px;
-  height: 300px;
-  background: linear-gradient(45deg, #1890ff, transparent);
-  border-radius: 50%;
-  transform: translate(50%, -50%);
-  opacity: 0.05;
-  z-index: 0;
+  left: 0;
+  bottom: 0;
+  background: url('https://yujinyu-ai.oss-cn-beijing.aliyuncs.com/5712e6616a226c045a0064ead2f6b15e.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  animation: moveBackground 25s linear infinite;
+  z-index: -1;
 }
 
 .login-card {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 50px;
   width: 100%;
   max-width: 450px;
@@ -374,15 +385,18 @@ import { loginApi } from '@/api/login';
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #e8e8e8;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 8px;
   transition: all 0.3s ease;
   overflow: hidden;
 }
 
 .input-wrapper:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .input-icon {
@@ -514,11 +528,13 @@ import { loginApi } from '@/api/login';
   margin-bottom: 30px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.3);
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(24, 144, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.4);
+  background: linear-gradient(135deg, #40a9ff, #1890ff);
 }
 
 .login-btn:active {
