@@ -6,7 +6,7 @@ export const getCarouselApi = () => {
 };
 
 // 获取热门法律案例
-export const getHotCasesApi = (page = 1, pageSize = 3) => {
+export const getHotCasesApi = (page = 1, pageSize = 6) => {
   return request.get(`/user/home/cases?page=${page}&pageSize=${pageSize}`);
 };
 

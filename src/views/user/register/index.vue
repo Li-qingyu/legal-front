@@ -78,11 +78,13 @@
             <div class="input-wrapper">
               <span class="input-icon">🔒</span>
               <input 
-                type="password" 
+                :type="showPassword ? 'text' : 'password'" 
                 id="password" 
                 class="form-input" 
                 placeholder="请输入密码"
                 v-model="registerForm.password"
+                @mouseenter="showPassword = true"
+                @mouseleave="showPassword = false"
               >
             </div>
           </div>
@@ -92,11 +94,13 @@
             <div class="input-wrapper">
               <span class="input-icon">🔒</span>
               <input 
-                type="password" 
+                :type="showConfirmPassword ? 'text' : 'password'" 
                 id="confirmPassword" 
                 class="form-input" 
                 placeholder="请再次输入密码"
                 v-model="registerForm.confirmPassword"
+                @mouseenter="showConfirmPassword = true"
+                @mouseleave="showConfirmPassword = false"
               >
             </div>
           </div>
@@ -157,6 +161,8 @@ import { registerApi, sendEmailCodeApi } from '@/api/login';
   let countdown = ref(0);
   let timer = null;
   let agreeTerms = ref(false);
+  let showPassword = ref(false);
+  let showConfirmPassword = ref(false);
   const router=useRouter();
   
   // 发送邮箱验证码

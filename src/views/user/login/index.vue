@@ -50,11 +50,13 @@
             <div class="input-wrapper">
               <span class="input-icon">🔒</span>
               <input 
-                type="password" 
+                :type="showPassword ? 'text' : 'password'" 
                 id="password" 
                 class="form-input" 
                 placeholder="请输入密码"
                 v-model="loginForm.password"
+                @mouseenter="showPassword = true"
+                @mouseleave="showPassword = false"
               >
             </div>
           </div>
@@ -90,6 +92,7 @@ import { loginApi } from '@/api/login';
 
   let loginForm = ref({username:'', password:''})
   const router=useRouter();
+  const showPassword = ref(false);
   const login= async()=>{ 
     try {
       const result = await loginApi(loginForm.value);
