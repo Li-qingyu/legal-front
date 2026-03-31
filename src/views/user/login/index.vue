@@ -102,10 +102,10 @@ import { loginApi } from '@/api/login';
         //存储当前员工登录信息
         localStorage.setItem('loginUser',JSON.stringify(result.data));
         //跳转页面
-        if (result.data.status === 1) {
-          router.push('/admin');  // status 为 1 跳转到 admin
-        } else if (result.data.status === 0) {
-          router.push('/user');   // status 为 0 跳转到 user
+        if (result.data.role === 1) {
+          router.push('/admin');  // role 为 1 跳转到 admin
+        } else if (result.data.role === 0) {
+          router.push('/user');   // role 为 0 跳转到 user
         } else {
           router.push('/user');   // 默认跳转
         }

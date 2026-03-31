@@ -18,12 +18,12 @@ onMounted(() => {
   queryAllLegalTypes()
 })
 
-//监听搜索条件变化，当搜索条件变为空时自动更新页面数据
+//监听搜索条件变化，当搜索条件变化时自动更新页面数据
 watch(searchClazz, (newVal, oldVal) => {
-  if ((!newVal.name || newVal.name === '') && 
-      (!newVal.typeId || newVal.typeId === '') && 
-      (!newVal.tag || newVal.tag === '') &&
-      (oldVal.name || oldVal.typeId || oldVal.tag)) {
+  // 当搜索条件发生变化时，触发数据重新加载
+  if (newVal.name !== oldVal.name || 
+      newVal.typeId !== oldVal.typeId || 
+      newVal.tag !== oldVal.tag) {
     queryPage()
   }
 }, { deep: true })
@@ -125,6 +125,7 @@ let clazz = ref({
   typeId: '',
   tags: '',
   content: '',
+  judgment: '',
   cover: '',
   status: '1'
 })
@@ -194,6 +195,7 @@ const clearClazz = () => {
     typeId: '',
     tags: '',
     content: '',
+    judgment: '',
     cover: '',
     status: '1'
   }
@@ -419,6 +421,10 @@ const toggleCaseStatus = async (id, currentStatus) => {
 
       <el-form-item label="案例内容" :label-width="labelWidth" prop="content">
         <el-input v-model="clazz.content" type="textarea" :rows="5" placeholder="请输入案例内容" />
+      </el-form-item>
+
+      <el-form-item label="判决结果" :label-width="labelWidth" prop="judgment">
+        <el-input v-model="clazz.judgment" type="textarea" :rows="3" placeholder="请输入判决结果" />
       </el-form-item>
 
       <el-form-item label="封面图片" :label-width="labelWidth">

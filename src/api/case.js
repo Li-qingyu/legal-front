@@ -6,9 +6,23 @@ export const queryPageApi = (name, typeId, tag, currentPage, pageSize) => {
     
 };
 
+// 用户端分页查询法律案例（只查询已发布的案例）
+export const queryPageApiForUser = (name, typeId, tag, currentPage, pageSize) => {
+  return request.get(`/admin/case?title=${name}&typeId=${typeId}&tag=${tag}&status=1&page=${currentPage}&pageSize=${pageSize}`);
+    
+};
+
 // 根据ID查询法律案例
 export const queryInfoApi = (id) => {
   return request.get(`/admin/case/${id}`);
+};
+
+//用户端根据ID查询法律案例
+export const queryInfoApiForUser = (id) => {
+  return request({
+    url: `/user/case/${id}`,
+    method: 'get'
+  });
 };
 
 // 添加法律案例

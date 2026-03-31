@@ -11,14 +11,14 @@
             class="search-input"
             prefix-icon="el-icon-search"
           />
-          <el-button type="primary" class="search-btn" @click="handleSearch">搜索</el-button>
+          <el-button type="info" class="search-btn" @click="handleSearch">搜索</el-button>
         </div>
         <div class="nav-links">
-          <router-link to="/" class="nav-link">首页</router-link>
-          <router-link to="/case" class="nav-link">法律案例</router-link>
-          <router-link to="/law" class="nav-link">法典</router-link>
-          <router-link to="/ai" class="nav-link">AI法律咨询</router-link>
-          <router-link to="/collection" class="nav-link">案例收藏</router-link>
+          <router-link to="/user" v-slot="{ isExactActive }" :class="['nav-link', { 'router-link-active': isExactActive }]">首页</router-link>
+          <router-link to="/user/case" class="nav-link">法律案例</router-link>
+          <router-link to="/user/law" class="nav-link">法典</router-link>
+          <router-link to="/user/ai" class="nav-link">AI法律咨询</router-link>
+          <router-link to="/user/collection" class="nav-link">案例收藏</router-link>
           <div class="user-menu">
             <el-dropdown trigger="hover">
               <span class="user-menu-trigger">
@@ -28,6 +28,7 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="openChangePasswordDialog">修改密码</el-dropdown-item>
+                  <el-dropdown-item v-if="userRole === 1" @click="goToAdmin">管理端</el-dropdown-item>
                   <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -75,104 +76,119 @@
 
     <!-- 主内容区 -->
     <main class="main-content">
-      <!-- 轮播图 -->
-      <el-carousel 
-        :interval="5000" 
-        type="card" 
-        height="500px" 
-        class="carousel"
-        indicator-position="outside"
-      >
-        <el-carousel-item v-for="(item, index) in carouselData" :key="index">
-          <div class="carousel-content" :style="{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${item.imageUrl ? item.imageUrl.trim().replace(/`/g, '') : ''})` }">
-            <h1 class="carousel-title">{{ item.title }}</h1>
-            <p class="carousel-subtitle">{{ item.subTitle || item.subtitle }}</p>
-            <router-link to="/ai">
-              <el-button type="warning" size="large" class="carousel-btn">{{ item.buttonText }}</el-button>
-            </router-link>
-          </div>
-        </el-carousel-item>
-        <!-- 默认轮播图，当API未返回数据时显示 -->
-        <el-carousel-item v-if="carouselData.length === 0">
-          <div class="carousel-content" :style="{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20advice%20background&image_size=landscape_16_9')` }">
-            <h1 class="carousel-title">专业法律咨询服务</h1>
-            <p class="carousel-subtitle">AI驱动的智能法律助手，为您提供专业、便捷的法律咨询</p>
-            <router-link to="/ai">
-              <el-button type="warning" size="large" class="carousel-btn">立即咨询</el-button>
-            </router-link>
-          </div>
-        </el-carousel-item>
-      </el-carousel>
-
-      <!-- 法律案例 -->
-      <section class="content-section">
-        <h2 class="section-title">
-          <i class="el-icon-document"></i> 热门法律案例
-        </h2>
-        <div class="case-grid">
-          <div class="case-card" v-for="(caseItem, index) in cases.slice(0, 6)" :key="index">
-            <div class="case-icon">
-              <i class="el-icon-collection-tag"></i>
-            </div>
-            <h3 class="case-title">{{ caseItem.title }}</h3>
-            <p class="case-summary">{{ caseItem.content }}</p>
-            <div class="case-meta">
-              <span><i class="el-icon-time"></i> {{ caseItem.publishTime }}</span>
-            </div>
-            <div class="case-actions">
-              <el-button size="small" type="text">查看详情</el-button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 法律内容 -->
-      <section class="content-section law-content">
-        <h2 class="section-title">
-          <i class="el-icon-notebook-1"></i> 法律条文
-        </h2>
-        <div class="law-list">
-          <div class="law-item" v-for="(law, index) in laws" :key="index">
-            <div class="law-item-header">
-              <h3 class="law-item-title">{{ law.name }}</h3>
-              <el-tag type="success" size="small">生效</el-tag>
-            </div>
-            <p class="law-item-meta">
-              <i class="el-icon-date"></i> 发布时间：{{ law.publishDate }} | 
-              <i class="el-icon-success"></i> 生效时间：{{ law.effectiveDate }}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- AI咨询助手 -->
-      <section class="ai-assistant">
-        <div class="ai-container">
-          <div class="ai-content">
-            <div class="ai-info">
-              <h2 class="ai-title">
-                <i class="el-icon-chat-line-square"></i> AI法律助手
-              </h2>
-              <p class="ai-description">
-                我们的AI法律助手基于Spring AI框架，结合阿里云百炼平台的Qwen模型，
-                能够查询数据库中的相关法律案例和法律知识，为您提供专业、准确的法律回答。
-              </p>
-              <router-link to="/ai">
-                <el-button type="warning" size="large" class="ai-btn">
-                  <i class="el-icon-position"></i> 开始咨询
-                </el-button>
+      <!-- 子路由内容 -->
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+      
+      <!-- 首页内容，仅在访问 /user 时显示 -->
+      <template v-if="$route.path === '/user'">
+        <!-- 轮播图 -->
+        <el-carousel 
+          :interval="5000" 
+          type="card" 
+          height="500px" 
+          class="carousel"
+          indicator-position="outside"
+        >
+          <el-carousel-item v-for="(item, index) in carouselData" :key="index">
+            <div class="carousel-content" :style="{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${item.imageUrl ? item.imageUrl.trim().replace(/`/g, '') : ''})` }">
+              <h1 class="carousel-title">{{ item.title }}</h1>
+              <p class="carousel-subtitle">{{ item.subTitle || item.subtitle }}</p>
+              <router-link :to="getCarouselLink(item.buttonText)">
+                <el-button type="warning" size="large" class="carousel-btn">{{ item.buttonText }}</el-button>
               </router-link>
             </div>
-            <div class="ai-image">
-              <img
-                src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20legal%20assistant%20robot&image_size=square"
-                alt="AI法律助手"
-                class="ai-image-img"
-              />
+          </el-carousel-item>
+          <!-- 默认轮播图，当API未返回数据时显示 -->
+          <el-carousel-item v-if="carouselData.length === 0">
+            <div class="carousel-content" :style="{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=legal%20advice%20background&image_size=landscape_16_9')` }">
+              <h1 class="carousel-title">专业法律咨询服务</h1>
+              <p class="carousel-subtitle">AI驱动的智能法律助手，为您提供专业、便捷的法律咨询</p>
+              <router-link to="/user/case">
+                <el-button type="warning" size="large" class="carousel-btn">了解更多</el-button>
+              </router-link>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+
+        <!-- 法律案例 -->
+        <section class="content-section">
+          <h2 class="section-title">
+            <i class="el-icon-document"></i> 热门法律案例
+          </h2>
+          <div class="case-grid">
+            <div class="case-card" v-for="(caseItem, index) in cases.slice(0, 6)" :key="index">
+              <div class="case-icon">
+                <i class="el-icon-collection-tag"></i>
+              </div>
+              <h3 class="case-title">{{ caseItem.title }}</h3>
+              <p class="case-summary">{{ caseItem.content }}</p>
+              <div class="case-meta">
+                <span><i class="el-icon-time"></i> {{ caseItem.publishTime }}</span>
+              </div>
+              <div class="case-actions">
+                <el-button size="small" type="text" @click="viewCaseDetail(caseItem.id)">查看详情</el-button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+          <div class="case-more">
+            <router-link to="/user/case" class="more-link">
+              <el-button type="primary" plain>查看更多案例</el-button>
+            </router-link>
+          </div>
+        </section>
+
+        <!-- 法律内容 -->
+        <section class="content-section law-content">
+          <h2 class="section-title">
+            <i class="el-icon-notebook-1"></i> 法律条文
+          </h2>
+          <div class="law-list">
+            <div class="law-item" v-for="(law, index) in laws" :key="index">
+              <div class="law-item-header">
+                <h3 class="law-item-title">{{ law.name }}</h3>
+                <el-tag type="success" size="small">生效</el-tag>
+              </div>
+              <p class="law-item-meta">
+                <i class="el-icon-date"></i> 发布时间：{{ law.publishDate }} | 
+                <i class="el-icon-success"></i> 生效时间：{{ law.effectiveDate }}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- AI咨询助手 -->
+        <section class="ai-assistant">
+          <div class="ai-container">
+            <div class="ai-content">
+              <div class="ai-info">
+                <h2 class="ai-title">
+                  <i class="el-icon-chat-line-square"></i> AI法律助手
+                </h2>
+                <p class="ai-description">
+                  我们的AI法律助手基于Spring AI框架，结合阿里云百炼平台的Qwen模型，
+                  能够查询数据库中的相关法律案例和法律知识，为您提供专业、准确的法律回答。
+                </p>
+                <router-link to="/user/ai">
+                  <el-button type="warning" size="large" class="ai-btn">
+                    <i class="el-icon-position"></i> 开始咨询
+                  </el-button>
+                </router-link>
+              </div>
+              <div class="ai-image">
+                <img
+                  src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20legal%20assistant%20robot&image_size=square"
+                  alt="AI法律助手"
+                  class="ai-image-img"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      </template>
     </main>
 
     <!-- 底部信息栏 -->
@@ -188,17 +204,17 @@
           <ul>
             <li><i class="el-icon-phone"></i> 电话：888-888-8888</li>
             <li><i class="el-icon-message"></i> 邮箱：contact@law-platform.com</li>
-            <li><i class="el-icon-location"></i> 地址：湖北省武汉市武汉市江夏区</li>
+            <li><i class="el-icon-location"></i> 地址：湖北省武汉市江夏区</li>
           </ul>
         </div>
         <div class="footer-column">
           <h3><i class="el-icon-link"></i> 快速链接</h3>
           <ul>
-            <li><router-link to="/">首页</router-link></li>
-            <li><router-link to="/case">法律案例</router-link></li>
-            <li><router-link to="/law">法典</router-link></li>
-            <li><router-link to="/ai">AI法律咨询</router-link></li>
-            <li><router-link to="/collection">案例收藏</router-link></li>
+            <li><router-link to="/user">首页</router-link></li>
+            <li><router-link to="/user/case">法律案例</router-link></li>
+            <li><router-link to="/user/law">法典</router-link></li>
+            <li><router-link to="/user/ai">AI法律咨询</router-link></li>
+            <li><router-link to="/user/collection">案例收藏</router-link></li>
           </ul>
         </div>
       </div>
@@ -213,9 +229,31 @@
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getCarouselApi, getHotCasesApi, getLawsApi, searchLawContentApi } from '@/api/home';
+import { useRouter } from 'vue-router';
 
 const activeIndex = ref('/');
 const searchQuery = ref('');
+const router = useRouter();
+const userRole = ref('');
+
+// 检查用户角色
+onMounted(async () => {
+  await loadHomeData();
+  checkUserRole();
+});
+
+// 检查用户角色
+function checkUserRole() {
+  const loginUser = JSON.parse(localStorage.getItem('loginUser'));
+  if (loginUser && loginUser.role) {
+    userRole.value = loginUser.role;
+  }
+}
+
+// 跳转到管理端
+function goToAdmin() {
+  router.push('/admin');
+}
 
 // 数据状态
 const carouselData = ref([]);
@@ -340,6 +378,27 @@ function handleChangePassword() {
   }
 }
 
+// 查看案例详情
+function viewCaseDetail(id) {
+  console.log('查看案例详情:', id);
+  router.push(`/user/case/${id}`);
+}
+
+// 根据按钮文本获取轮播图链接
+function getCarouselLink(buttonText) {
+  switch (buttonText) {
+    case '立即查询':
+    case '立即咨询':
+      return '/user/ai';
+    case '开始查看':
+      return '/user/law';
+    case '了解更多':
+      return '/user/case';
+    default:
+      return '/user/case';
+  }
+}
+
 // 退出登录
 function handleLogout() {
   // 清除本地存储中的用户信息
@@ -367,18 +426,8 @@ function handleLogout() {
 }
 
 .navbar {
-  background: linear-gradient(to right, #1e3c72, #2a5298);
+  background: linear-gradient(to right, #2c3e50, #34495e);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-.navbar {
-  background-color: transparent;
-  box-shadow: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -441,11 +490,16 @@ function handleLogout() {
 }
 
 .nav-link:hover {
-  color: #1890ff;
+  color: #3498db;
 }
 
 .nav-link.router-link-active {
-  color: #1890ff;
+  color: #3498db;
+  font-weight: 500;
+}
+
+.nav-link.router-link-exact-active {
+  color: #3498db;
   font-weight: 500;
 }
 
@@ -466,7 +520,7 @@ function handleLogout() {
 }
 
 .user-menu-trigger:hover {
-  color: #1890ff;
+  color: #3498db;
 }
 
 .password-tip {
@@ -610,6 +664,16 @@ function handleLogout() {
   justify-content: flex-end;
 }
 
+.case-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.more-link {
+  text-decoration: none;
+}
+
 .law-content {
   margin-top: 60px;
 }
@@ -660,7 +724,7 @@ function handleLogout() {
 
 .ai-assistant {
   margin-top: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   padding: 60px 0;
   color: white;
 }
@@ -699,21 +763,21 @@ function handleLogout() {
 }
 
 .ai-btn {
-  background: linear-gradient(to right, #ff9a9e, #fad0c4);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   padding: 15px 30px;
   border-radius: 30px;
   font-size: 18px;
   cursor: pointer;
   transition: all 0.3s;
-  border: 2px solid transparent;
 }
 
 .ai-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255,255,255,0.5);
 }
 
 .ai-image {

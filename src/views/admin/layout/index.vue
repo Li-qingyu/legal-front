@@ -47,6 +47,10 @@ const logout=()=>{
               <el-icon><Promotion /></el-icon>首页
             </el-menu-item>
 
+            <el-menu-item index="/user">
+              <el-icon><UserFilled /></el-icon>用户端
+            </el-menu-item>
+
             <el-sub-menu index="/manage">
               <template #title>
                 <el-icon><Menu /></el-icon>管理菜单
