@@ -65,6 +65,7 @@ import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRoute, useRouter } from 'vue-router';
 import { queryInfoApiForUser } from '@/api/case';
+import { collectCaseApi, cancelCollectionApi } from '@/api/collection';
 
 const route = useRoute();
 const router = useRouter();
@@ -100,6 +101,11 @@ async function loadCaseDetail(id) {
       if (cover) {
         cover = cover.trim().replace(/^`|`$/g, '');
       }
+      
+      // 从本地存储获取收藏的案例
+      const savedCollection = localStorage.getItem('collectedCases');
+      const collectedCaseIds = savedCollection ? JSON.parse(savedCollection).map(c => c.id) : [];
+      
       caseDetail.value = {
         id: data.id,
         title: data.title,
@@ -109,7 +115,7 @@ async function loadCaseDetail(id) {
         type: data.type || '',
         tags: data.tags || '',
         cover: cover,
-        isCollected: false
+        isCollected: collectedCaseIds.includes(data.id)
       };
     } else {
       ElMessage.error('加载案例详情失败：' + (response.msg || '未知错误'));
@@ -122,13 +128,50 @@ async function loadCaseDetail(id) {
 
 // 返回列表页
 function goBack() {
-  router.push('/user/case');
+  // 检查是否从收藏页面跳转过来
+  const from = route.query.from;
+  if (from === 'collection') {
+    router.push('/user/collection');
+  } else {
+    router.push('/user/case');
+  }
 }
 
 // 收藏案例
-function collectCase() {
-  caseDetail.value.isCollected = !caseDetail.value.isCollected;
-  ElMessage.success(caseDetail.value.isCollected ? '收藏成功' : '取消收藏成功');
+async function collectCase() {
+  try {
+    if (caseDetail.value.isCollected) {
+      // 取消收藏
+      await cancelCollectionApi(caseDetail.value.id);
+      caseDetail.value.isCollected = false;
+      ElMessage.success('取消收藏成功');
+    } else {
+      // 收藏
+      await collectCaseApi(caseDetail.value.id);
+      caseDetail.value.isCollected = true;
+      ElMessage.success('收藏成功');
+    }
+    
+    // 更新本地存储
+    const savedCollection = localStorage.getItem('collectedCases');
+    let allCollectedCases = savedCollection ? JSON.parse(savedCollection) : [];
+    
+    if (caseDetail.value.isCollected) {
+      // 添加到收藏
+      if (!allCollectedCases.some(c => c.id === caseDetail.value.id)) {
+        allCollectedCases.push(caseDetail.value);
+      }
+    } else {
+      // 从收藏中移除
+      allCollectedCases = allCollectedCases.filter(c => c.id !== caseDetail.value.id);
+    }
+    
+    // 保存回本地存储
+    localStorage.setItem('collectedCases', JSON.stringify(allCollectedCases));
+  } catch (err) {
+    console.error('收藏操作失败:', err);
+    ElMessage.error('收藏操作失败，请稍后重试');
+  }
 }
 
 // 咨询AI助手

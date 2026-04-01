@@ -84,6 +84,7 @@ import { ref, onMounted, watch } from 'vue';
 import { ElMessage, FormInstance } from 'element-plus';
 import { queryPageApiForUser } from '@/api/case';
 import { queryAllApi1 } from '@/api/type';
+import { collectCaseApi, cancelCollectionApi } from '@/api/collection';
 import { useRouter } from 'vue-router';
 
 // 案例类型定义
@@ -203,9 +204,14 @@ async function loadCaseData() {
     if (response && response.data) {
       cases.value = response.data.records || [];
       total.value = response.data.total || 0;
+      
+      // 从本地存储获取收藏的案例
+      const savedCollection = localStorage.getItem('collectedCases');
+      const collectedCaseIds = savedCollection ? JSON.parse(savedCollection).map((c: Case) => c.id) : [];
+      
       // 为每个案例添加isCollected属性
       cases.value.forEach(caseItem => {
-        caseItem.isCollected = false;
+        caseItem.isCollected = collectedCaseIds.includes(caseItem.id);
         // 从typeName设置type字段
         caseItem.type = caseItem.typeName;
       });
@@ -248,11 +254,42 @@ function viewCaseDetail(id) {
 }
 
 // 收藏案例
-function collectCase(id) {
+async function collectCase(id) {
   const caseItem = cases.value.find(item => item.id === id);
   if (caseItem) {
-    caseItem.isCollected = !caseItem.isCollected;
-    ElMessage.success(caseItem.isCollected ? '收藏成功' : '取消收藏成功');
+    try {
+      if (caseItem.isCollected) {
+        // 取消收藏
+        await cancelCollectionApi(id);
+        caseItem.isCollected = false;
+        ElMessage.success('取消收藏成功');
+      } else {
+        // 收藏
+        await collectCaseApi(id);
+        caseItem.isCollected = true;
+        ElMessage.success('收藏成功');
+      }
+      
+      // 更新本地存储
+      const savedCollection = localStorage.getItem('collectedCases');
+      let allCollectedCases = savedCollection ? JSON.parse(savedCollection) : [];
+      
+      if (caseItem.isCollected) {
+        // 添加到收藏
+        if (!allCollectedCases.some(c => c.id === caseItem.id)) {
+          allCollectedCases.push(caseItem);
+        }
+      } else {
+        // 从收藏中移除
+        allCollectedCases = allCollectedCases.filter(c => c.id !== caseItem.id);
+      }
+      
+      // 保存回本地存储
+      localStorage.setItem('collectedCases', JSON.stringify(allCollectedCases));
+    } catch (err) {
+      console.error('收藏操作失败:', err);
+      ElMessage.error('收藏操作失败，请稍后重试');
+    }
   }
   console.log('收藏案例:', id);
 }

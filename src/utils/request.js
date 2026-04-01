@@ -1,7 +1,7 @@
 import axios from 'axios'
 // 暂时注释掉Element Plus和router的导入，项目初步构建阶段可能还未集成
-// import { ElMessage } from 'element-plus';
-// import router from '../router'
+import { ElMessage } from 'element-plus';
+import router from '../router'
 
 //创建axios实例对象
 const request = axios.create({
@@ -14,10 +14,10 @@ request.interceptors.request.use(
   (config) => { //成功回调
     //在请求头中增加token
     // 暂时注释掉token逻辑，项目初步构建阶段可能还未实现登录功能
-    // const loginUser=JSON.parse(localStorage.getItem('loginUser'));
-    // if (loginUser&&loginUser.token) {
-    //   config.headers.token = loginUser.token;
-    // }
+    const loginUser=JSON.parse(localStorage.getItem('loginUser'));
+    if (loginUser&&loginUser.token) {
+      config.headers.token = loginUser.token;
+    }
     // 对于FormData对象，不设置Content-Type，让axios自动处理
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type']
@@ -36,12 +36,12 @@ request.interceptors.response.use(
   },
   (error) => { //失败回调
     // 暂时注释掉错误处理逻辑，项目初步构建阶段可能还未集成相关功能
-    // if(error.response.status===401){
-    //   //提示信息
-    //   ElMessage.error('请重新登陆！');
-    //   //跳转登陆页面
-    //   router.push('/login');
-    // }
+    if(error.response.status===401){
+      //提示信息
+      ElMessage.error('请重新登陆！');
+      //跳转登陆页面
+      router.push('/login');
+    }
     return Promise.reject(error)
   }
 )

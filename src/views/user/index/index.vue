@@ -403,7 +403,6 @@ function getCarouselLink(buttonText) {
 function handleLogout() {
   // 清除本地存储中的用户信息
   localStorage.removeItem('loginUser');
-  
   // 显示退出登录成功的提示
   ElMessage.success('退出登录成功');
   
