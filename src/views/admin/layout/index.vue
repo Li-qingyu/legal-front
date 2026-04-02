@@ -80,29 +80,68 @@ const logout=()=>{
 /* 整体布局 */
 .common-layout {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
 }
 
 /* Header 样式 */
 .header {
-  background: linear-gradient(135deg, #1a5fb4 0%, #3584e4 50%, #62a0ea 100%);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3584e4 100%);
+  box-shadow: 0 4px 20px rgba(30, 60, 114, 0.25);
   position: relative;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: 10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .title {
   color: white;
-  font-size: 28px;
+  font-size: 32px;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
   line-height: 60px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 2px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title::before {
+  content: '⚖️';
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .right_tool {
-  float: right;
+  position: relative;
+  z-index: 1;
   line-height: 60px;
 }
 
@@ -111,61 +150,197 @@ const logout=()=>{
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .right_tool a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.right_tool .el-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.right_tool a:hover .el-icon {
+  transform: rotate(180deg);
 }
 
 /* 左侧菜单样式 */
 .aside {
-  width: 220px;
-  background-color: #fff;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  width: 240px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
   min-height: calc(100vh - 60px);
+  border-right: 1px solid rgba(30, 60, 114, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.aside::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1e3c72, #d4af37, #1e3c72);
 }
 
 .aside :deep(.el-menu) {
   border-right: none;
-  padding: 10px 0;
+  padding: 20px 12px;
+  background: transparent;
 }
 
 .aside :deep(.el-menu-item),
 .aside :deep(.el-sub-menu__title) {
-  height: 50px;
-  line-height: 50px;
-  margin: 4px 10px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  height: 52px;
+  line-height: 52px;
+  margin: 6px 8px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  font-size: 15px;
+  color: #1e3c72;
+  position: relative;
+  overflow: hidden;
+}
+
+.aside :deep(.el-menu-item::before),
+.aside :deep(.el-sub-menu__title::before) {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #d4af37, #1e3c72);
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
 }
 
 .aside :deep(.el-menu-item:hover),
 .aside :deep(.el-sub-menu__title:hover) {
-  background-color: #ecf5ff;
-  color: #409eff;
+  background: linear-gradient(135deg, rgba(30, 60, 114, 0.08) 0%, rgba(42, 82, 152, 0.08) 100%);
+  color: #1e3c72;
+  transform: translateX(4px);
+}
+
+.aside :deep(.el-menu-item:hover::before),
+.aside :deep(.el-sub-menu__title:hover::before) {
+  transform: scaleY(1);
 }
 
 .aside :deep(.el-menu-item.is-active) {
-  background-color: #409eff;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(30, 60, 114, 0.3);
+  transform: translateX(4px);
+}
+
+.aside :deep(.el-menu-item.is-active::before) {
+  transform: scaleY(1);
+  background: linear-gradient(180deg, #d4af37, #f0c419);
+}
+
+.aside :deep(.el-sub-menu .el-menu-item) {
+  padding-left: 48px !important;
+  margin: 4px 8px;
+  height: 48px;
+  line-height: 48px;
+  font-size: 14px;
+}
+
+.aside :deep(.el-sub-menu .el-menu-item.is-active) {
+  background: linear-gradient(135deg, rgba(30, 60, 114, 0.15) 0%, rgba(42, 82, 152, 0.15) 100%);
+  color: #1e3c72;
+  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.15);
 }
 
 .aside :deep(.el-icon) {
-  margin-right: 8px;
+  margin-right: 10px;
   font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.aside :deep(.el-menu-item:hover .el-icon),
+.aside :deep(.el-sub-menu__title:hover .el-icon) {
+  transform: scale(1.1);
+}
+
+.aside :deep(.el-sub-menu__icon-arrow) {
+  transition: transform 0.3s ease;
+}
+
+.aside :deep(.el-sub-menu.is-opened > .el-sub-menu__title .el-sub-menu__icon-arrow) {
+  transform: rotate(180deg);
 }
 
 /* 主内容区域 */
 :deep(.el-main) {
-  padding: 0;
-  background-color: #f5f7fa;
+  padding: 24px;
+  background: transparent;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .header {
+    padding: 0 24px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .aside {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+  }
+  
+  .title {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+  
+  .title::before {
+    font-size: 24px;
+  }
+  
+  .right_tool a {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .aside {
+    width: 180px;
+  }
+  
+  .aside :deep(.el-menu-item),
+  .aside :deep(.el-sub-menu__title) {
+    height: 48px;
+    line-height: 48px;
+    font-size: 14px;
+  }
+  
+  .aside :deep(.el-icon) {
+    font-size: 16px;
+  }
 }
 </style>

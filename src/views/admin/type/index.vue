@@ -132,12 +132,42 @@ const rules=ref({
 </script>
 
 <template>
-  <h3>法律类型管理</h3>
-  <div class="container">
-    <el-input v-model="searchKeyword" placeholder="搜索法律类型..." style="width: 300px; margin-right: 10px;"></el-input>
-    <el-button type="primary" @click="search">搜索</el-button>
-    <el-button type="primary" plain @click="addDept" style="margin-left: 10px;">添加法律类型</el-button>
-  </div>
+    <!-- 顶部标题 -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 16H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <h1 class="page-title">法律类型管理</h1>
+          <p class="page-subtitle">Legal Type Management System</p>
+        </div>
+        <div class="header-decoration">
+          <div class="decoration-line"></div>
+          <div class="decoration-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 条件搜索表单 -->
+    <el-form :inline="true" :model="{keyword: searchKeyword}" class="demo-form-inline">
+      <el-form-item label="法律类型">
+        <el-input v-model="searchKeyword" placeholder="搜索法律类型..." style="width: 300px;"/>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="search">搜索</el-button>
+      </el-form-item>
+    </el-form>
+    
+    <!-- 功能按钮 -->
+    <el-button type="success" @click="addDept">添加法律类型</el-button>
+    <br><br>
   <!-- Dialog对话框 -->
   <el-dialog v-model="dialogFormVisible" :title="fromName" width="500">
     <el-form :model="dept" :rules="rules" ref="deptFormRef">
@@ -185,132 +215,343 @@ const rules=ref({
   min-height: 100vh;
 }
 
-/* 标题样式 */
-h3 {
-  font-size: 24px;
-  font-weight: 600;
-  color: #303133;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+/* 页面头部样式 */
+.page-header {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3584e4 100%);
+  border-radius: 16px;
+  padding: 32px 40px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(30, 60, 114, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.header-content {
   display: flex;
   align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
 }
 
-h3::before {
-  content: '';
-  width: 4px;
-  height: 24px;
-  background-color: #409eff;
-  margin-right: 12px;
-  border-radius: 2px;
+.header-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #d4af37;
+  flex-shrink: 0;
 }
 
-/* 容器样式 */
-.container {
-  margin: 20px 0;
-  background-color: #fff;
-  padding: 20px;
+.header-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.header-decoration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.6;
+}
+
+.decoration-line {
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+
+.decoration-dot {
+  width: 8px;
+  height: 8px;
+  background: #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+/* 搜索表单样式 */
+.demo-form-inline {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(30, 60, 114, 0.08);
+}
+
+.demo-form-inline :deep(.el-form-item) {
+  margin-bottom: 0;
+  margin-right: 20px;
+}
+
+.demo-form-inline :deep(.el-form-item__label) {
+  color: #1e3c72;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.demo-form-inline :deep(.el-input__wrapper) {
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* 搜索框样式 */
-.container .el-input {
-  margin-right: 10px;
-}
-
-.container .el-input :deep(.el-input__inner) {
-  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
-.container .el-input :deep(.el-input__inner:focus) {
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+.demo-form-inline :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+}
+
+.demo-form-inline :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
 }
 
 /* 按钮样式 */
 .el-button {
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  padding: 10px 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.el-button:hover {
+.el-button--primary {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.el-button--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+}
+
+.el-button--success {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.el-button--success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(82, 196, 26, 0.3);
+}
+
+.el-button--warning {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+}
+
+.el-button--warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(250, 173, 20, 0.3);
+}
+
+.el-button--danger {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+}
+
+.el-button--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3);
+}
+
+.el-button--info {
+  background: linear-gradient(135deg, #8c8c8c 0%, #bfbfbf 100%);
+}
+
+.el-button--info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(140, 140, 140, 0.3);
 }
 
 /* 表格样式 */
 .el-table {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(30, 60, 114, 0.08);
 }
 
 .el-table :deep(th) {
-  background-color: #f5f7fa !important;
-  color: #606266;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+  color: #ffffff;
   font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .el-table :deep(td) {
-  padding: 12px 0;
+  padding: 16px 0;
+  font-size: 14px;
+}
+
+.el-table :deep(.el-table__row) {
+  transition: all 0.3s ease;
 }
 
 .el-table :deep(.el-table__row:hover) {
-  background-color: #f5f7fa;
+  background-color: rgba(30, 60, 114, 0.05);
+  transform: scale(1.01);
+}
+
+.el-table :deep(.el-table__row:hover td) {
+  background-color: transparent;
 }
 
 /* 操作按钮样式 */
 .el-table .el-button {
   margin: 0 4px;
+  padding: 6px 14px;
+  font-size: 13px;
 }
 
 /* 对话框样式 */
 :deep(.el-dialog) {
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 :deep(.el-dialog__header) {
-  background-color: #f5f7fa;
-  padding: 20px;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 24px 32px;
   margin: 0;
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: none;
 }
 
 :deep(.el-dialog__title) {
   font-weight: 600;
-  color: #303133;
+  color: #ffffff;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+:deep(.el-dialog__headerbtn .el-dialog__close) {
+  color: #ffffff;
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-dialog__headerbtn .el-dialog__close:hover) {
+  color: #d4af37;
+  transform: rotate(90deg);
 }
 
 :deep(.el-dialog__body) {
-  padding: 30px 20px;
+  padding: 32px;
+  background-color: #fafafa;
 }
 
 :deep(.el-dialog__footer) {
-  padding: 15px 20px;
-  border-top: 1px solid #e4e7ed;
-  background-color: #f5f7fa;
+  padding: 20px 32px;
+  border-top: 1px solid rgba(30, 60, 114, 0.1);
+  background-color: #ffffff;
 }
 
 /* 表单样式 */
 :deep(.el-form-item__label) {
-  font-weight: 500;
-  color: #606266;
+  font-weight: 600;
+  color: #1e3c72;
+  font-size: 14px;
 }
 
-:deep(.el-input__inner),
+:deep(.el-input__wrapper),
 :deep(.el-textarea__inner) {
-  border-radius: 4px;
+  border-radius: 8px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-:deep(.el-input__inner:focus),
+:deep(.el-input__wrapper:hover),
+:deep(.el-textarea__inner:hover) {
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+}
+
+:deep(.el-input__wrapper.is-focus),
 :deep(.el-textarea__inner:focus) {
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
+  border-color: #1e3c72;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .page-header {
+    padding: 24px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .header-icon {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .header-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 20px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-decoration {
+    display: none;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .demo-form-inline {
+    padding: 16px;
+  }
+  
+  .demo-form-inline :deep(.el-form-item) {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
 }
 </style>

@@ -3,7 +3,7 @@
     <!-- 顶部导航栏 -->
     <el-header height="60px" class="navbar">
       <div class="navbar-container">
-        <router-link to="/" class="logo">法律咨询平台</router-link>
+        <router-link to="/user" class="logo">法律咨询平台</router-link>
         <div class="search-container">
           <el-input
             v-model="searchQuery"
@@ -144,13 +144,15 @@
         <!-- 法律内容 -->
         <section class="content-section law-content">
           <h2 class="section-title">
-            <i class="el-icon-notebook-1"></i> 法律条文
+            <i class="el-icon-notebook-1"></i> 法典
           </h2>
           <div class="law-list">
-            <div class="law-item" v-for="(law, index) in laws" :key="index">
+            <div class="law-item" v-for="(law, index) in laws" :key="index" @click="viewLawDetail(law.id)">
               <div class="law-item-header">
-                <h3 class="law-item-title">{{ law.name }}</h3>
-                <el-tag type="success" size="small">生效</el-tag>
+                <h3 class="law-item-title">{{ law.articleTitle || law.name }}</h3>
+                <el-tag :type="isLawEffective(law.effectiveDate) ? 'success' : 'info'" size="small">
+                  {{ isLawEffective(law.effectiveDate) ? '生效' : '未生效' }}
+                </el-tag>
               </div>
               <p class="law-item-meta">
                 <i class="el-icon-date"></i> 发布时间：{{ law.publishDate }} | 
@@ -384,6 +386,12 @@ function viewCaseDetail(id) {
   router.push(`/user/case/${id}`);
 }
 
+// 查看法律条文详情
+function viewLawDetail(id) {
+  console.log('查看法律条文详情:', id);
+  router.push(`/user/law/articles/${id}`);
+}
+
 // 根据按钮文本获取轮播图链接
 function getCarouselLink(buttonText) {
   switch (buttonText) {
@@ -397,6 +405,14 @@ function getCarouselLink(buttonText) {
     default:
       return '/user/case';
   }
+}
+
+// 判断法律条文是否生效
+function isLawEffective(effectiveDate) {
+  if (!effectiveDate) return false;
+  const date = new Date(effectiveDate);
+  const currentDate = new Date();
+  return date <= currentDate;
 }
 
 // 退出登录
@@ -687,11 +703,14 @@ function handleLogout() {
 .law-item {
   padding: 20px 25px;
   border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .law-item:hover {
   background-color: #f9f9f9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .law-item:last-child {

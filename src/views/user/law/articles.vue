@@ -1,36 +1,64 @@
 <template>
-  <div class="law-page">
+  <div class="law-articles-page">
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="page-header-container">
-        <h1 class="page-title">法典</h1>
+        <h1 class="page-title">{{ lawBookName }}</h1>
         <p class="page-subtitle">浏览和查询法律条文，了解法律法规</p>
       </div>
     </div>
 
-    <!-- 法典列表 -->
+    <!-- 法律条文筛选 -->
+    <div class="filter-section">
+      <div class="filter-container">
+        <el-form :inline="true" class="filter-form">
+          <el-form-item label="条文标题">
+            <el-input v-model="searchQuery" placeholder="搜索法律条文..." />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleSearch">搜索</el-button>
+            <el-button @click="resetFilter">清空</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+
+    <!-- 法律条文列表 -->
     <div class="law-section">
       <div class="law-container">
         <div class="law-grid">
-          <div class="law-card" v-for="book in lawBooks" :key="book.id">
+          <div class="law-card" v-for="article in lawArticles" :key="article.id">
             <div class="law-icon">
               <i class="el-icon-document"></i>
             </div>
             <div class="law-card-header">
-              <h3 class="law-title">{{ book.name }}</h3>
-              <el-tag size="small" :type="isBookEffective(book.effectiveDate) ? 'success' : 'info'">
-                {{ isBookEffective(book.effectiveDate) ? '生效' : '未生效' }}
+              <h3 class="law-title">{{ article.articleTitle }}</h3>
+              <el-tag size="small" :type="isArticleEffective(article.effectiveDate) ? 'success' : 'info'">
+                {{ isArticleEffective(article.effectiveDate) ? '生效' : '未生效' }}
               </el-tag>
             </div>
-            <p class="law-description">{{ book.description || '点击查看该法典的法律条文' }}</p>
+            <p class="law-content">{{ article.content }}</p>
             <div class="law-meta">
-              <span><i class="el-icon-date"></i> 发布时间：{{ book.publishDate || '未知' }}</span>
-              <span><i class="el-icon-success"></i> 生效时间：{{ book.effectiveDate || '未知' }}</span>
+              <span><i class="el-icon-date"></i> 发布时间：{{ article.publishDate }}</span>
+              <span><i class="el-icon-success"></i> 生效时间：{{ article.effectiveDate }}</span>
             </div>
             <div class="law-actions">
-              <el-button size="small" type="primary" @click="viewLawArticles(book.id)">查看条文</el-button>
+              <el-button size="small" type="text" @click="viewLawDetail(article.id)">查看详情</el-button>
             </div>
           </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination-container">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[3, 9, 27, 54, 81, 243]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
         </div>
       </div>
     </div>
@@ -38,51 +66,115 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getAllLawBooksApi } from '@/api/law-book';
-import { useRouter } from 'vue-router';
+import { queryPageApi } from '@/api/law-article';
+import { queryInfoApi as queryLawBookInfoApi } from '@/api/law-book';
+import { useRouter, useRoute } from 'vue-router';
 
-// 法律书列表
-const lawBooks = ref([]);
+// 路由参数
+const route = useRoute();
 const router = useRouter();
+
+// 法律书ID
+const lawBookId = computed(() => route.params.id);
+
+// 法律书名称
+const lawBookName = ref('');
+
+// 搜索关键词
+const searchQuery = ref('');
+
+// 分页
+const currentPage = ref(1);
+const pageSize = ref(9);
+const total = ref(0);
+
+// 法律条文数据
+const lawArticles = ref([]);
 
 // 初始化数据
 onMounted(async () => {
-  await loadLawBooks();
+  await loadLawBookInfo();
+  await loadLawArticles();
 });
 
-// 加载法律书列表
-async function loadLawBooks() {
+// 加载法律书信息
+async function loadLawBookInfo() {
   try {
-    const response = await getAllLawBooksApi();
+    const response = await queryLawBookInfoApi(lawBookId.value);
     if (response && response.data) {
-      lawBooks.value = response.data;
+      lawBookName.value = response.data.name;
     }
-    console.log('加载法律书列表成功:', lawBooks.value);
+    console.log('加载法律书信息成功:', lawBookName.value);
   } catch (err) {
-    console.error('加载法律书列表失败:', err);
-    ElMessage.error('加载法律书列表失败，请稍后重试');
+    console.error('加载法律书信息失败:', err);
+    ElMessage.error('加载法律书信息失败，请稍后重试');
   }
 }
 
-// 查看法律条文列表
-function viewLawArticles(bookId) {
-  console.log('查看法律条文列表:', bookId);
-  router.push(`/user/law/articles/${bookId}`);
+// 加载法律条文数据
+async function loadLawArticles() {
+  try {
+    const response = await queryPageApi(
+      lawBookId.value,
+      searchQuery.value,
+      currentPage.value,
+      pageSize.value
+    );
+    
+    if (response && response.data) {
+      lawArticles.value = response.data.records || [];
+      total.value = response.data.total || 0;
+    }
+    console.log('加载法律条文数据成功:', lawArticles.value);
+  } catch (err) {
+    console.error('加载法律条文数据失败:', err);
+    ElMessage.error('加载法律条文数据失败，请稍后重试');
+  }
 }
 
-// 判断法典是否生效
-function isBookEffective(effectiveDate) {
+// 搜索
+async function handleSearch() {
+  currentPage.value = 1; // 搜索时重置页码
+  await loadLawArticles();
+}
+
+// 重置筛选
+function resetFilter() {
+  searchQuery.value = '';
+  currentPage.value = 1;
+  loadLawArticles();
+}
+
+// 查看法律条文详情
+function viewLawDetail(id) {
+  console.log('查看法律条文详情:', id);
+  router.push(`/user/law/detail/${id}`);
+}
+
+// 判断法律条文是否生效
+function isArticleEffective(effectiveDate) {
   if (!effectiveDate) return false;
   const date = new Date(effectiveDate);
   const currentDate = new Date();
   return date <= currentDate;
 }
+
+// 分页处理
+function handleSizeChange(size) {
+  pageSize.value = size;
+  loadLawArticles();
+}
+
+function handleCurrentChange(current) {
+  currentPage.value = current;
+  loadLawArticles();
+}
 </script>
 
 <style scoped>
-.law-page {
+.law-articles-page {
   padding: 20px;
   min-height: 600px;
 }
@@ -215,16 +307,6 @@ function isBookEffective(effectiveDate) {
   -webkit-text-fill-color: transparent;
 }
 
-.law-book-name {
-  font-size: 14px;
-  color: #999;
-  margin-bottom: 10px;
-  padding: 4px 12px;
-  background-color: #f5f7fa;
-  border-radius: 16px;
-  align-self: flex-start;
-}
-
 .law-card-header {
   display: flex;
   justify-content: space-between;
@@ -246,7 +328,7 @@ function isBookEffective(effectiveDate) {
   align-self: flex-start;
 }
 
-.law-description {
+.law-content {
   font-size: 14px;
   color: #666;
   margin-bottom: 15px;

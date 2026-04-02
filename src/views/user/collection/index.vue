@@ -51,7 +51,7 @@
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
+            :page-sizes="[3, 9, 27, 54, 81, 243]"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
             @size-change="handleSizeChange"
@@ -86,7 +86,7 @@ interface Case {
 
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(9);
 const total = ref(0);
 
 // 案例数据

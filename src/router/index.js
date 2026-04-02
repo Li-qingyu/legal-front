@@ -34,6 +34,8 @@ const router = createRouter({
         { path: 'case', name: 'userCase', component: UserCaseView },
         { path: 'case/:id', name: 'userCaseDetail', component: () => import('@/views/user/case/detail.vue') },
         { path: 'law', name: 'userLaw', component: UserLawView },
+        { path: 'law/articles/:id', name: 'userLawArticles', component: () => import('@/views/user/law/articles.vue') },
+        { path: 'law/detail/:id', name: 'userLawDetail', component: () => import('@/views/user/law/detail.vue') },
         { path: 'ai', name: 'userAi', component: UserAiView},
         { path: 'collection', name: 'userCollection', component: UserCollectionView}
       ]
