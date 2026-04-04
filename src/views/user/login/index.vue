@@ -67,7 +67,7 @@
               <span class="checkmark"></span>
               记住我
             </label>
-            <a href="#" class="forgot-password">忘记密码？</a>
+            <a href="#" class="forgot-password" @click.prevent="showForgotPasswordModal = true">忘记密码？</a>
           </div>
           
           <button type="submit" class="login-btn" @click="login">
@@ -81,6 +81,108 @@
         </form>
       </div>
     </div>
+    
+    <!-- 忘记密码弹窗 -->
+    <div v-if="showForgotPasswordModal" class="modal-overlay" @click="closeForgotPasswordModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">忘记密码</h3>
+          <button class="modal-close" @click="closeForgotPasswordModal">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="resetPassword">
+            <div class="form-group">
+              <label class="form-label" for="forgotUsername">用户名</label>
+              <div class="input-wrapper">
+                <span class="input-icon">👤</span>
+                <input 
+                  type="text" 
+                  id="forgotUsername" 
+                  class="form-input" 
+                  placeholder="请输入用户名"
+                  v-model="forgotForm.username"
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="forgotEmail">邮箱</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📧</span>
+                <input 
+                  type="email" 
+                  id="forgotEmail" 
+                  class="form-input" 
+                  placeholder="请输入邮箱"
+                  v-model="forgotForm.email"
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="forgotEmailCode">邮箱验证码</label>
+              <div class="code-input-container">
+                <div class="input-wrapper code-input-wrapper">
+                  <span class="input-icon">📧</span>
+                  <input 
+                    type="text" 
+                    id="forgotEmailCode" 
+                    class="form-input code-input" 
+                    placeholder="请输入邮箱验证码"
+                    v-model="forgotForm.emailCode"
+                  >
+                </div>
+                <button 
+                  type="button" 
+                  class="code-btn" 
+                  @click="sendForgotEmailCode" 
+                  :disabled="forgotCountdown > 0"
+                >
+                  {{ forgotCountdown > 0 ? `${forgotCountdown}s后重试` : '发送验证码' }}
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="forgotPassword">新密码</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input 
+                  :type="showForgotPassword ? 'text' : 'password'" 
+                  id="forgotPassword" 
+                  class="form-input" 
+                  placeholder="请输入新密码"
+                  v-model="forgotForm.password"
+                  @mouseenter="showForgotPassword = true"
+                  @mouseleave="showForgotPassword = false"
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="forgotConfirmPassword">确认新密码</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input 
+                  :type="showForgotConfirmPassword ? 'text' : 'password'" 
+                  id="forgotConfirmPassword" 
+                  class="form-input" 
+                  placeholder="请再次输入新密码"
+                  v-model="forgotForm.confirmPassword"
+                  @mouseenter="showForgotConfirmPassword = true"
+                  @mouseleave="showForgotConfirmPassword = false"
+                >
+              </div>
+            </div>
+            
+            <button type="submit" class="login-btn" @click="resetPassword">
+              <span class="btn-text">重置密码</span>
+              <span class="btn-icon">→</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -88,11 +190,20 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { loginApi } from '@/api/login';
+import { loginApi, sendEmailCodeApi, resetPasswordApi } from '@/api/login';
 
   let loginForm = ref({username:'', password:''})
   const router=useRouter();
   const showPassword = ref(false);
+  
+  // 忘记密码相关
+  const showForgotPasswordModal = ref(false);
+  const forgotForm = ref({username:'', email:'', emailCode:'', password:'', confirmPassword:''});
+  const forgotCountdown = ref(0);
+  const forgotTimer = ref(null);
+  const showForgotPassword = ref(false);
+  const showForgotConfirmPassword = ref(false);
+  
   const login= async()=>{ 
     try {
       const result = await loginApi(loginForm.value);
@@ -118,6 +229,108 @@ import { loginApi } from '@/api/login';
       ElMessage.error('登录失败，请稍后重试');
     }
   }
+
+  // 打开忘记密码弹窗
+  const openForgotPasswordModal = () => {
+    showForgotPasswordModal.value = true;
+  };
+  
+  // 关闭忘记密码弹窗
+  const closeForgotPasswordModal = () => {
+    showForgotPasswordModal.value = false;
+    clearForgotForm();
+  };
+  
+  // 清除忘记密码表单
+  const clearForgotForm = () => {
+    forgotForm.value = {username:'', email:'', emailCode:'', password:'', confirmPassword:''};
+    forgotCountdown.value = 0;
+    if (forgotTimer.value) {
+      clearInterval(forgotTimer.value);
+      forgotTimer.value = null;
+    }
+  };
+  
+  // 发送忘记密码邮箱验证码
+  const sendForgotEmailCode = async () => {
+    // 验证邮箱格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!forgotForm.value.email) {
+      ElMessage.error('请输入邮箱');
+      return;
+    }
+    if (!emailRegex.test(forgotForm.value.email)) {
+      ElMessage.error('请输入有效的邮箱地址');
+      return;
+    }
+    
+    try {
+      // 调用发送验证码API
+      const result = await sendEmailCodeApi(forgotForm.value.email);
+      if(result.code) {
+        ElMessage.success('验证码已发送，请查收');
+        // 开始倒计时
+        startForgotCountdown();
+      } else {
+        ElMessage.error(result.msg);
+      }
+    } catch (error) {
+      ElMessage.error('发送验证码失败，请稍后重试');
+    }
+  };
+  
+  // 开始忘记密码倒计时
+  const startForgotCountdown = () => {
+    forgotCountdown.value = 180;
+    forgotTimer.value = setInterval(() => {
+      forgotCountdown.value--;
+      if (forgotCountdown.value <= 0) {
+        clearInterval(forgotTimer.value);
+        forgotTimer.value = null;
+      }
+    }, 1000);
+  };
+  
+  // 重置密码
+  const resetPassword = async () => {
+    // 表单验证
+    if (!forgotForm.value.username) {
+      ElMessage.error('请输入用户名');
+      return;
+    }
+    if (!forgotForm.value.email) {
+      ElMessage.error('请输入邮箱');
+      return;
+    }
+    if (!forgotForm.value.emailCode) {
+      ElMessage.error('请输入邮箱验证码');
+      return;
+    }
+    if (!forgotForm.value.password) {
+      ElMessage.error('请输入新密码');
+      return;
+    }
+    if (forgotForm.value.password !== forgotForm.value.confirmPassword) {
+      ElMessage.error('两次输入的密码不一致');
+      return;
+    }
+    
+    try {
+      const result = await resetPasswordApi(forgotForm.value);
+      if(result.code){ 
+        //重置密码成功
+        ElMessage.success("密码重置成功，请登录");
+        //关闭弹窗
+        closeForgotPasswordModal();
+
+      }else{ 
+        //重置密码失败
+        ElMessage.error(result.msg);
+      }
+    } catch (error) {
+      ElMessage.error('重置密码失败，请稍后重试');
+    }
+  };
 
   const clear=()=>{ 
     loginForm.value={username:'', password:''} ;
@@ -612,6 +825,147 @@ import { loginApi } from '@/api/login';
   transform-origin: left;
 }
 
+/* 忘记密码弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeInUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333333;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999999;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close:hover {
+  color: #333333;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+/* 验证码输入容器 */
+.code-input-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.code-input-wrapper {
+  flex: 1;
+}
+
+.code-input {
+  width: 100%;
+}
+
+.code-btn {
+  padding: 0 20px;
+  height: 50px;
+  background: linear-gradient(135deg, #1890ff, #096dd9);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.3);
+}
+
+.code-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.4);
+  background: linear-gradient(135deg, #40a9ff, #1890ff);
+}
+
+.code-btn:disabled {
+  background-color: #e8e8e8;
+  color: #999999;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.code-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition);
+}
+
+.code-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
   .login-container {
@@ -643,6 +997,10 @@ import { loginApi } from '@/api/login';
 
   .login-card {
     padding: 40px;
+  }
+
+  .modal-content {
+    margin: 0 30px;
   }
 }
 
@@ -715,6 +1073,29 @@ import { loginApi } from '@/api/login';
   .login-btn {
     padding: 14px;
     font-size: 14px;
+  }
+
+  .modal-content {
+    margin: 0 20px;
+    padding: 0;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .code-btn {
+    padding: 0 16px;
+    height: 44px;
+    font-size: 12px;
   }
 }
 </style>

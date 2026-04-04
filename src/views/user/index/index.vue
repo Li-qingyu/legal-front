@@ -19,57 +19,11 @@
           <router-link to="/user/law" class="nav-link">法典</router-link>
           <router-link to="/user/ai" class="nav-link">AI法律咨询</router-link>
           <router-link to="/user/collection" class="nav-link">案例收藏</router-link>
-          <div class="user-menu">
-            <el-dropdown trigger="hover">
-              <span class="user-menu-trigger">
-                个人中心
-                <i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="openChangePasswordDialog">修改密码</el-dropdown-item>
-                  <el-dropdown-item v-if="userRole === 1" @click="goToAdmin">管理端</el-dropdown-item>
-                  <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-
-          <!-- 修改密码对话框 -->
-          <el-dialog
-            v-model="changePasswordDialogVisible"
-            title="修改密码"
-            width="400px"
-          >
-            <el-form :model="changePasswordForm" label-width="80px" :rules="changePasswordRules" ref="changePasswordFormRef">
-              <el-form-item label="旧密码" prop="oldPassword">
-                <el-input v-model="changePasswordForm.oldPassword" type="password" placeholder="请输入旧密码" show-password />
-              </el-form-item>
-              <el-form-item label="新密码" prop="newPassword">
-                <el-input 
-                  v-model="changePasswordForm.newPassword" 
-                  type="password" 
-                  placeholder="请输入新密码" 
-                  show-password 
-                />
-                <div class="password-tip">密码长度至少8位，包含字母和数字</div>
-              </el-form-item>
-              <el-form-item label="确认新密码" prop="confirmPassword">
-                <el-input 
-                  v-model="changePasswordForm.confirmPassword" 
-                  type="password" 
-                  placeholder="请确认新密码" 
-                  show-password 
-                />
-              </el-form-item>
-            </el-form>
-            <template #footer>
-              <span class="dialog-footer">
-                <el-button @click="changePasswordDialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="handleChangePassword">确定</el-button>
-              </span>
-            </template>
-          </el-dialog>
+          <router-link to="/user/profile" class="nav-link">个人中心</router-link>
+          <router-link v-if="userRole === 1" to="/admin" class="nav-link">管理端</router-link>
+          <el-button type="text" class="logout-btn" @click="handleLogout">
+            <i class="el-icon-switch-button"></i> 退出登录
+          </el-button>
         </div>
       </div>
     </el-header>
@@ -217,6 +171,7 @@
             <li><router-link to="/user/law">法典</router-link></li>
             <li><router-link to="/user/ai">AI法律咨询</router-link></li>
             <li><router-link to="/user/collection">案例收藏</router-link></li>
+            <li><router-link to="/user/profile">个人中心</router-link></li>
           </ul>
         </div>
       </div>
@@ -229,7 +184,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { getCarouselApi, getHotCasesApi, getLawsApi, searchLawContentApi } from '@/api/home';
 import { useRouter } from 'vue-router';
 
@@ -257,46 +212,17 @@ function goToAdmin() {
   router.push('/admin');
 }
 
+// 跳转到个人中心
+function goToProfile() {
+  router.push('/user/profile');
+}
+
 // 数据状态
 const carouselData = ref([]);
 const cases = ref([]);
 const laws = ref([]);
 const loading = ref(false);
 const error = ref('');
-
-// 修改密码相关
-const changePasswordDialogVisible = ref(false);
-const changePasswordForm = ref({
-  oldPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-});
-const changePasswordFormRef = ref(null);
-
-// 修改密码表单验证规则
-const changePasswordRules = {
-  oldPassword: [
-    { required: true, message: '请输入旧密码', trigger: 'blur' }
-  ],
-  newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 8, message: '密码长度至少8位', trigger: 'blur' },
-    { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, message: '密码必须包含字母和数字', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, message: '请确认新密码', trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (value !== changePasswordForm.value.newPassword) {
-          callback(new Error('两次输入的密码不一致'));
-        } else {
-          callback();
-        }
-      },
-      trigger: 'blur'
-    }
-  ]
-};
 
 // 初始化数据
 onMounted(async () => {
@@ -347,39 +273,6 @@ async function handleSearch() {
   }
 }
 
-// 打开修改密码对话框
-function openChangePasswordDialog() {
-  changePasswordForm.value = {
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  };
-  changePasswordDialogVisible.value = true;
-}
-
-// 处理修改密码
-function handleChangePassword() {
-  if (changePasswordFormRef.value) {
-    changePasswordFormRef.value.validate((valid) => {
-      if (valid) {
-        // 这里可以添加修改密码的逻辑，比如调用后端API
-        console.log('修改密码:', changePasswordForm.value);
-        
-        // 模拟修改密码成功
-        // 实际项目中需要根据后端API进行处理
-        setTimeout(() => {
-          // 显示成功消息
-          ElMessage.success('密码修改成功');
-          changePasswordDialogVisible.value = false;
-        }, 1000);
-      } else {
-        // 表单验证失败
-        return false;
-      }
-    });
-  }
-}
-
 // 查看案例详情
 function viewCaseDetail(id) {
   console.log('查看案例详情:', id);
@@ -417,18 +310,28 @@ function isLawEffective(effectiveDate) {
 
 // 退出登录
 function handleLogout() {
-  // 清除本地存储中的用户信息
-  localStorage.removeItem('loginUser');
-  // 显示退出登录成功的提示
-  ElMessage.success('退出登录成功');
-  
-  // 跳转到登录页面
-  // 由于项目中可能还没有集成router，暂时使用window.location.href
-  setTimeout(() => {
-    window.location.href = '/login';
-  }, 1000);
-  
-  console.log('退出登录');
+  ElMessageBox.confirm('确定要退出登录吗？', '退出登录', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      // 清除本地存储中的用户信息
+      localStorage.removeItem('loginUser');
+      // 显示退出登录成功的提示
+      ElMessage.success('退出登录成功');
+      
+      // 跳转到登录页面
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
+      
+      console.log('退出登录');
+    })
+    .catch(() => {
+      // 取消退出
+      console.log('取消退出登录');
+    });
 }
 </script>
 
@@ -459,6 +362,8 @@ function handleLogout() {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .logo {
@@ -468,18 +373,21 @@ function handleLogout() {
   text-decoration: none;
   white-space: nowrap;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  flex-shrink: 0;
 }
 
 .search-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 1 400px;
+  flex: 1 1 auto;
   margin: 0 20px;
+  min-width: 200px;
+  max-width: 400px;
 }
 
 .search-input {
-  width: 300px;
+  width: 100%;
   margin-right: 0;
   border-radius: 4px 0 0 4px;
 }
@@ -488,12 +396,14 @@ function handleLogout() {
   padding: 0 16px;
   border-radius: 0 4px 4px 0;
   margin-left: -1px;
+  flex-shrink: 0;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
+  flex-shrink: 0;
 }
 
 .nav-link {
@@ -502,6 +412,7 @@ function handleLogout() {
   font-size: 16px;
   transition: color 0.3s;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -518,23 +429,19 @@ function handleLogout() {
   font-weight: 500;
 }
 
-.user-menu {
-  position: relative;
-}
-
-.user-menu-trigger {
-  display: inline-block;
+.logout-btn {
+  color: #fff;
+  font-size: 16px;
+  transition: color 0.3s;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   padding: 0 10px;
   height: 60px;
   line-height: 60px;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: color 0.3s;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin: 0;
+  white-space: nowrap;
 }
 
-.user-menu-trigger:hover {
+.logout-btn:hover {
   color: #3498db;
 }
 

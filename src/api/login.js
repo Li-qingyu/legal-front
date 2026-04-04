@@ -15,3 +15,9 @@ export const registerApi=(data)=>{
 export const sendEmailCodeApi=(email)=>{
   return request.post('/sendEmailCode',{email});
 }
+
+
+//重置密码
+export const resetPasswordApi=(data)=>{
+  return request.post('/resetPassword',data);
+}

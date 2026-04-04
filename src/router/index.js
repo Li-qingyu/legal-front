@@ -16,6 +16,7 @@ import UserCaseView from '@/views/user/case/index.vue'
 import UserLawView from '@/views/user/law/index.vue'
 import UserAiView from '@/views/user/ai/index.vue'
 import UserCollectionView from '@/views/user/collection/index.vue'
+import UserProfileView from '@/views/user/profile/index.vue'
 
 
 const router = createRouter({
@@ -37,7 +38,8 @@ const router = createRouter({
         { path: 'law/articles/:id', name: 'userLawArticles', component: () => import('@/views/user/law/articles.vue') },
         { path: 'law/detail/:id', name: 'userLawDetail', component: () => import('@/views/user/law/detail.vue') },
         { path: 'ai', name: 'userAi', component: UserAiView},
-        { path: 'collection', name: 'userCollection', component: UserCollectionView}
+        { path: 'collection', name: 'userCollection', component: UserCollectionView},
+        { path: 'profile', name: 'userProfile', component: UserProfileView}
       ]
     },
     {
