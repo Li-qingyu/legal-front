@@ -413,6 +413,12 @@ function handleLogout() {
   transition: color 0.3s;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px;
+  vertical-align: middle;
 }
 
 .nav-link:hover {
@@ -435,14 +441,23 @@ function handleLogout() {
   transition: color 0.3s;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   padding: 0 10px;
-  height: 60px;
-  line-height: 60px;
   margin: 0;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .logout-btn:hover {
   color: #3498db;
+  background: transparent;
 }
 
 .password-tip {
