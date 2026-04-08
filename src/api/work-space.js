@@ -23,3 +23,8 @@ export const getUserCountApi = () => {
 export const getTrendDataApi=()=>{
   return request.get('/admin/work-space/trend');
 }
+
+// 获取最近活动
+export const getRecentActivitiesApi = () => {
+  return request.get('/admin/dashboard/activities');
+};

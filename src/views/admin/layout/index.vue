@@ -42,7 +42,7 @@ const logout=()=>{
       <el-container>
         <!-- 左侧菜单 -->
         <el-aside width="200px" class="aside">
-          <el-menu router>
+          <el-menu router :default-openeds="['/manage']">
             <el-menu-item index="/admin/index">
               <el-icon><Promotion /></el-icon>首页
             </el-menu-item>

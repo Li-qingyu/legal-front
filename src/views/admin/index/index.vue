@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getCaseCountApi, getTypeCountApi, getArticleCountApi, getUserCountApi, getTrendDataApi } from "@/api/work-space";
+import { getCaseCountApi, getTypeCountApi, getArticleCountApi, getUserCountApi, getTrendDataApi, getRecentActivitiesApi } from "@/api/work-space";
 
 const stats = ref([
   { 
@@ -48,15 +48,11 @@ const quickActions = ref([
   { title: '用户管理', icon: '👥', path: '/admin/user', color: '#ff4d4f' }
 ]);
 
-const recentActivities = ref([
-  { type: 'case', title: '新增法律案例：劳动合同纠纷案例', time: '10分钟前', icon: '📚' },
-  { type: 'user', title: '新用户注册：张三', time: '30分钟前', icon: '👤' },
-  { type: 'update', title: '更新法律条文：民法典第123条', time: '1小时前', icon: '📝' },
-  { type: 'collection', title: '用户收藏案例：交通事故责任认定', time: '2小时前', icon: '⭐' }
-]);
+const recentActivities = ref([]);
 
 onMounted(() => {
   loadStats();
+  loadRecentActivities();
 });
 
 const loadStats = async () => {
@@ -109,6 +105,63 @@ const loadStats = async () => {
     }
   } catch (error) {
     console.error('加载统计数据失败:', error);
+  }
+};
+
+const loadRecentActivities = async () => {
+  try {
+    const response = await getRecentActivitiesApi();
+    recentActivities.value = response.data || [];
+  } catch (error) {
+    console.error('加载最近活动失败:', error);
+  }
+};
+
+// 根据活动类型获取对应的图标
+const getActivityIcon = (type) => {
+  const iconMap = {
+    // 案例相关
+    'case_add': '📚',
+    'case_update': '�',
+    'case_delete': '🗑️',
+    // 法律条文相关
+    'law_add': '📜',
+    'law_update': '📝',
+    'law_delete': '🗑️',
+    // 用户相关
+    'user_add': '�',
+    'user_update': '👤',
+    'user_delete': '�️',
+    'user_register': '👥',
+    // 法律类型相关
+    'type_add': '⚖️',
+    'type_update': '📝',
+    'type_delete': '🗑️',
+    // 法律书籍相关
+    'book_add': '📖',
+    'book_update': '📝',
+    'book_delete': '🗑️'
+  };
+  return iconMap[type] || '📋';
+};
+
+// 格式化时间
+const formatTime = (timeString) => {
+  const date = new Date(timeString);
+  const now = new Date();
+  const diff = now - date;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (minutes < 60) {
+    return `${minutes}分钟前`;
+  } else if (hours < 24) {
+    return `${hours}小时前`;
+  } else if (days < 7) {
+    return `${days}天前`;
+  } else {
+    return date.toLocaleDateString('zh-CN');
   }
 };
 </script>
@@ -173,15 +226,21 @@ const loadStats = async () => {
       <div class="activities-list">
         <div 
           v-for="(activity, index) in recentActivities" 
-          :key="index" 
+          :key="activity.id || index" 
           class="activity-item"
         >
-          <div class="activity-icon">{{ activity.icon }}</div>
+          <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
           <div class="activity-content">
             <div class="activity-title">{{ activity.title }}</div>
-            <div class="activity-time">{{ activity.time }}</div>
+            <div class="activity-meta">
+              <span class="activity-user">{{ activity.userName }}</span>
+              <span class="activity-time">{{ formatTime(activity.time) }}</span>
+            </div>
           </div>
           <div class="activity-indicator"></div>
+        </div>
+        <div v-if="recentActivities.length === 0" class="no-activities">
+          <p>暂无最近活动</p>
         </div>
       </div>
     </div>
@@ -574,6 +633,29 @@ const loadStats = async () => {
   background: #d4af37;
   border-radius: 50%;
   box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+.activity-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.activity-user {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.no-activities {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin-top: 16px;
 }
 
 /* 响应式设计 */
