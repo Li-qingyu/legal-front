@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { ElMessage, FormInstance } from 'element-plus';
-import { queryPageApiForUser } from '@/api/case';
+import { queryPageApiForUser } from '@/api/case.js';
 import { queryAllApi1 } from '@/api/type';
 import { collectCaseApi, cancelCollectionApi } from '@/api/collection';
 import { useRouter } from 'vue-router';
@@ -102,10 +102,16 @@ interface Case {
   isCollected?: boolean;
 }
 
+// 法律类型接口
+interface Type {
+  id: number;
+  name: string;
+}
+
 const searchQuery = ref('');
 
 // 法律类型列表
-const typeList = ref([]);
+const typeList = ref<Type[]>([]);
 
 // 筛选表单
 const filterForm = ref({
@@ -145,15 +151,15 @@ const changePasswordRules = {
   confirmPassword: [
     { required: true, message: '请确认新密码', trigger: 'blur' },
     {
-      validator: (rule, value, callback) => {
-        if (value !== changePasswordForm.value.newPassword) {
-          callback(new Error('两次输入的密码不一致'));
-        } else {
-          callback();
-        }
-      },
-      trigger: 'blur'
-    }
+        validator: (rule: any, value: string, callback: (error?: Error) => void) => {
+          if (value !== changePasswordForm.value.newPassword) {
+            callback(new Error('两次输入的密码不一致'));
+          } else {
+            callback();
+          }
+        },
+        trigger: 'blur'
+      }
   ]
 };
 
@@ -207,7 +213,7 @@ async function loadCaseData() {
       
       // 从本地存储获取收藏的案例
       const savedCollection = localStorage.getItem('collectedCases');
-      const collectedCaseIds = savedCollection ? JSON.parse(savedCollection).map((c: Case) => c.id) : [];
+      const collectedCaseIds = savedCollection ? (JSON.parse(savedCollection) as Case[]).map((c: Case) => c.id) : [];
       
       // 为每个案例添加isCollected属性
       cases.value.forEach(caseItem => {
@@ -248,13 +254,13 @@ function resetFilter() {
 }
 
 // 查看案例详情
-function viewCaseDetail(id) {
+function viewCaseDetail(id: number) {
   console.log('查看案例详情:', id);
   router.push(`/user/case/${id}`);
 }
 
 // 收藏案例
-async function collectCase(id) {
+async function collectCase(id: number) {
   const caseItem = cases.value.find(item => item.id === id);
   if (caseItem) {
     try {
@@ -272,16 +278,16 @@ async function collectCase(id) {
       
       // 更新本地存储
       const savedCollection = localStorage.getItem('collectedCases');
-      let allCollectedCases = savedCollection ? JSON.parse(savedCollection) : [];
+      let allCollectedCases: Case[] = savedCollection ? JSON.parse(savedCollection) : [];
       
       if (caseItem.isCollected) {
         // 添加到收藏
-        if (!allCollectedCases.some(c => c.id === caseItem.id)) {
+        if (!allCollectedCases.some((c: Case) => c.id === caseItem.id)) {
           allCollectedCases.push(caseItem);
         }
       } else {
         // 从收藏中移除
-        allCollectedCases = allCollectedCases.filter(c => c.id !== caseItem.id);
+        allCollectedCases = allCollectedCases.filter((c: Case) => c.id !== caseItem.id);
       }
       
       // 保存回本地存储
@@ -295,12 +301,12 @@ async function collectCase(id) {
 }
 
 // 分页处理
-function handleSizeChange(size) {
+function handleSizeChange(size: number) {
   pageSize.value = size;
   loadCaseData();
 }
 
-function handleCurrentChange(current) {
+function handleCurrentChange(current: number) {
   currentPage.value = current;
   loadCaseData();
 }

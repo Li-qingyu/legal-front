@@ -4,21 +4,21 @@
       <div class="header-content">
         <div class="user-info">
           <div class="welcome-message">
-            <i class="el-icon-sunny"></i> 欢迎回来
+            <i class="fa fa-sun-o"></i> 欢迎回来
           </div>
           <h2 class="username">{{ userInfo.username || '用户' }}</h2>
           <p class="user-status">{{ userInfo.status == 1 ? '正常' : '已禁用' }}</p>
           <div class="user-stats">
             <div class="stat-item">
-              <i class="el-icon-document"></i>
+              <i class="fa fa-file-text-o"></i>
               <span>法律案例</span>
             </div>
             <div class="stat-item">
-              <i class="el-icon-notebook-1"></i>
+              <i class="fa fa-book"></i>
               <span>法典查询</span>
             </div>
             <div class="stat-item">
-              <i class="el-icon-chat-dot-round"></i>
+              <i class="fa fa-robot"></i>
               <span>AI咨询</span>
             </div>
           </div>
@@ -33,7 +33,7 @@
     <div class="profile-content">
       <div class="info-section">
         <h3 class="section-title">
-          <i class="el-icon-info"></i> 基本信息
+          <i class="fa fa-user-circle"></i> 基本信息
         </h3>
         <div class="info-card">
           <div class="info-item">
@@ -59,7 +59,7 @@
         </div>
         <div class="action-buttons">
           <el-button type="primary" @click="openEditDialog">
-            <i class="el-icon-edit"></i> 修改信息
+            <i class="fa fa-pencil"></i> 修改信息
           </el-button>
         </div>
       </div>
@@ -68,20 +68,20 @@
     <div class="profile-content">
       <div class="info-section password-management">
         <h3 class="section-title">
-          <i class="el-icon-lock"></i> 密码管理
+          <i class="fa fa-lock"></i> 密码管理
         </h3>
         <div class="password-card">
           <div class="password-security-status">
             <div class="security-item">
-              <i class="el-icon-check-circle security-icon"></i>
+              <i class="fa fa-check-circle security-icon"></i>
               <span>定期修改密码</span>
             </div>
             <div class="security-item">
-              <i class="el-icon-check-circle security-icon"></i>
+              <i class="fa fa-check-circle security-icon"></i>
               <span>使用强密码</span>
             </div>
             <div class="security-item">
-              <i class="el-icon-check-circle security-icon"></i>
+              <i class="fa fa-check-circle security-icon"></i>
               <span>保护账号安全</span>
             </div>
           </div>
@@ -91,7 +91,7 @@
           </div>
           <div class="password-action">
             <el-button type="warning" size="large" @click="openChangePasswordDialog">
-              <i class="el-icon-key"></i> 修改密码
+              <i class="fa fa-key"></i> 修改密码
             </el-button>
           </div>
         </div>
@@ -101,12 +101,12 @@
     <div class="profile-content">
       <div class="info-section">
         <h3 class="section-title">
-          <i class="el-icon-star-on"></i> 案例收藏
+          <i class="fa fa-star"></i> 案例收藏
         </h3>
         <div class="collection-card">
           <p class="collection-tip">查看和管理您收藏的法律案例</p>
           <el-button type="success" @click="goToCollection">
-            <i class="el-icon-star-on"></i> 查看收藏
+            <i class="fa fa-star"></i> 查看收藏
           </el-button>
         </div>
       </div>
@@ -115,7 +115,7 @@
     <div class="profile-content">
       <div class="info-section">
         <h3 class="section-title">
-          <i class="el-icon-chat-dot-round"></i> AI对话历史
+          <i class="fa fa-comments"></i> AI对话历史
         </h3>
         <div class="history-card">
           <el-empty v-if="consultationHistory.length === 0" description="暂无对话历史" />
@@ -403,23 +403,30 @@ const handleChangePassword = () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
 .profile-container {
-  min-height: calc(100vh - 60px);
-  margin-top: 60px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: calc(100vh - 70px);
+  margin-top: 70px;
+  background: #F8FAFC;
   padding: 40px 20px;
+  font-family: 'Lato', sans-serif;
 }
 
+/* 头部区域 */
 .profile-header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3584e4 100%);
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
   border-radius: 16px;
-  padding: 30px 40px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 24px rgba(30, 60, 114, 0.25);
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .profile-header::before {
@@ -429,8 +436,19 @@ const handleChangePassword = () => {
   right: -10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(180, 83, 9, 0.1) 0%, transparent 70%);
   border-radius: 50%;
+}
+
+.profile-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+  z-index: 1;
 }
 
 .header-content {
@@ -439,13 +457,13 @@ const handleChangePassword = () => {
   justify-content: space-between;
   width: 100%;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -454,19 +472,19 @@ const handleChangePassword = () => {
   color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 500;
   animation: fadeIn 1s ease-in-out;
 }
 
 .welcome-message i {
-  font-size: 16px;
-  color: #d4af37;
+  font-size: 18px;
+  color: #B45309;
   animation: pulse 2s infinite;
 }
 
 .username {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
@@ -474,7 +492,8 @@ const handleChangePassword = () => {
   animation: slideIn 0.8s ease-out;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: 'EB Garamond', serif;
 }
 
 .user-status {
@@ -482,12 +501,15 @@ const handleChangePassword = () => {
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   animation: slideIn 0.8s ease-out 0.2s both;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .user-stats {
   display: flex;
-  gap: 15px;
-  margin-top: 8px;
+  gap: 20px;
+  margin-top: 12px;
   animation: slideIn 0.8s ease-out 0.4s both;
 }
 
@@ -495,29 +517,29 @@ const handleChangePassword = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 14px;
+  gap: 6px;
+  padding: 14px 20px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
-  min-width: 80px;
+  min-width: 100px;
 }
 
 .stat-item:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .stat-item i {
-  font-size: 18px;
-  color: #d4af37;
+  font-size: 20px;
+  color: #B45309;
 }
 
 .stat-item span {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
   text-align: center;
@@ -559,66 +581,83 @@ const handleChangePassword = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   opacity: 0.6;
-  margin-left: 30px;
+  margin-left: 40px;
 }
 
 .decoration-line {
-  width: 80px;
+  width: 100px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  background: linear-gradient(90deg, transparent, #B45309, transparent);
 }
 
 .decoration-dot {
-  width: 8px;
-  height: 8px;
-  background: #d4af37;
+  width: 10px;
+  height: 10px;
+  background: #B45309;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 16px rgba(180, 83, 9, 0.6);
+  animation: pulse 2s infinite;
 }
 
+/* 内容区域 */
 .profile-content {
   max-width: 1200px;
-  margin: 0 auto 30px;
+  margin: 0 auto 40px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 30px;
 }
 
-.info-section,
-.password-section {
+.info-section {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E2E8F0;
+  transition: all 0.3s ease;
+}
+
+.info-section:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  color: #1e3c72;
-  margin: 0 0 25px 0;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
+  color: #1E3A8A;
+  margin: 0 0 30px 0;
+  padding-bottom: 16px;
+  border-bottom: 3px solid #B45309;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: 'EB Garamond', serif;
 }
 
 .section-title i {
-  font-size: 22px;
+  font-size: 24px;
+  color: #B45309;
 }
 
 .info-card {
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  padding: 18px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 20px 0;
+  border-bottom: 1px solid #F1F5F9;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover {
+  background: #F8FAFC;
+  padding-left: 12px;
+  border-left: 4px solid #1E3A8A;
 }
 
 .info-item:last-child {
@@ -626,103 +665,134 @@ const handleChangePassword = () => {
 }
 
 .info-label {
-  width: 100px;
+  width: 120px;
   font-weight: 600;
-  color: #666666;
-  font-size: 14px;
+  color: #64748B;
+  font-size: 15px;
 }
 
 .info-value {
   flex: 1;
-  color: #333333;
-  font-size: 15px;
+  color: #1E293B;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .action-buttons {
   display: flex;
-  gap: 15px;
+  gap: 16px;
   justify-content: flex-end;
+  padding-top: 24px;
+  border-top: 1px solid #F1F5F9;
 }
 
 .collection-card,
 .history-card {
   text-align: center;
-  padding: 20px;
+  padding: 30px;
+  background: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
 }
 
+/* 密码管理 */
 .password-management {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 2px solid rgba(250, 173, 20, 0.2);
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  border: 2px solid rgba(180, 83, 9, 0.1);
 }
 
 .password-card {
   text-align: center;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 36px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E2E8F0;
 }
 
 .password-security-status {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(250, 173, 20, 0.05);
-  border-radius: 8px;
-  border-left: 4px solid #faad14;
+  margin-bottom: 36px;
+  padding: 24px;
+  background: rgba(180, 83, 9, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid #B45309;
 }
 
 .security-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.security-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
 }
 
 .security-icon {
-  font-size: 24px;
-  color: #52c41a;
-  margin-bottom: 5px;
+  font-size: 28px;
+  color: #10B981;
+  margin-bottom: 8px;
 }
 
 .security-item span {
   font-size: 14px;
-  color: #666666;
+  color: #64748B;
   font-weight: 500;
+  text-align: center;
 }
 
 .password-tip {
-  color: #666666;
-  font-size: 14px;
-  margin-bottom: 30px;
+  color: #64748B;
+  font-size: 15px;
+  margin-bottom: 36px;
   line-height: 1.6;
+  background: #F1F5F9;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #3B82F6;
 }
 
 .password-tip p {
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
 .password-action {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .collection-tip {
-  color: #999999;
-  font-size: 14px;
-  margin-bottom: 20px;
+  color: #94A3B8;
+  font-size: 15px;
+  margin-bottom: 24px;
   line-height: 1.6;
 }
 
+/* 历史记录 */
 .history-list {
   text-align: left;
 }
 
 .history-item {
-  padding: 15px;
-  border-bottom: 1px solid #f5f5f5;
-  margin-bottom: 15px;
+  padding: 20px;
+  border-bottom: 1px solid #F1F5F9;
+  margin-bottom: 20px;
+  background: #F8FAFC;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #1E3A8A;
+}
+
+.history-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .history-item:last-child {
@@ -732,81 +802,103 @@ const handleChangePassword = () => {
 
 .history-question,
 .history-answer {
-  margin-bottom: 10px;
-  line-height: 1.5;
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
 .history-label {
   font-weight: 600;
-  color: #1e3c72;
-  margin-right: 8px;
-}
-
-.history-content {
-  color: #333333;
+  color: #1E3A8A;
+  margin-right: 10px;
   font-size: 14px;
 }
 
-.history-time {
-  font-size: 12px;
-  color: #999999;
-  text-align: right;
-  margin-top: 10px;
+.history-content {
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
+.history-time {
+  font-size: 13px;
+  color: #94A3B8;
+  text-align: right;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #E2E8F0;
+}
+
+/* 按钮样式 */
 .el-button {
   border-radius: 8px;
-  font-weight: 500;
-  padding: 12px 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  padding: 12px 28px;
+  transition: all 0.3s ease;
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
 }
 
 .el-button--primary {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: #1E3A8A;
+  border-color: #1E3A8A;
 }
 
 .el-button--primary:hover {
+  background: #1E40AF;
+  border-color: #1E40AF;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
 }
 
 .el-button--warning {
-  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+  background: #B45309;
+  border-color: #B45309;
+  color: white;
 }
 
 .el-button--warning:hover {
+  background: #92400E;
+  border-color: #92400E;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(250, 173, 20, 0.3);
+  box-shadow: 0 8px 24px rgba(180, 83, 9, 0.3);
 }
 
 .el-button--success {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  background: #10B981;
+  border-color: #10B981;
+  color: white;
 }
 
 .el-button--success:hover {
+  background: #059669;
+  border-color: #059669;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(82, 196, 26, 0.3);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
 }
 
 .el-button--danger {
-  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  background: #EF4444;
+  border-color: #EF4444;
+  color: white;
 }
 
 .el-button--danger:hover {
+  background: #DC2626;
+  border-color: #DC2626;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
 }
 
+/* 对话框样式 */
 :deep(.el-dialog) {
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 }
 
 :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
   padding: 24px 32px;
   margin: 0;
   border-bottom: none;
@@ -817,6 +909,7 @@ const handleChangePassword = () => {
   color: #ffffff;
   font-size: 18px;
   letter-spacing: 0.5px;
+  font-family: 'EB Garamond', serif;
 }
 
 :deep(.el-dialog__headerbtn .el-dialog__close) {
@@ -826,24 +919,24 @@ const handleChangePassword = () => {
 }
 
 :deep(.el-dialog__headerbtn .el-dialog__close:hover) {
-  color: #d4af37;
+  color: #B45309;
   transform: rotate(90deg);
 }
 
 :deep(.el-dialog__body) {
   padding: 32px;
-  background-color: #fafafa;
+  background-color: #F8FAFC;
 }
 
 :deep(.el-dialog__footer) {
-  padding: 20px 32px;
-  border-top: 1px solid rgba(30, 60, 114, 0.1);
+  padding: 24px 32px;
+  border-top: 1px solid rgba(30, 58, 138, 0.1);
   background-color: #ffffff;
 }
 
 :deep(.el-form-item__label) {
   font-weight: 600;
-  color: #1e3c72;
+  color: #1E3A8A;
   font-size: 14px;
 }
 
@@ -851,36 +944,47 @@ const handleChangePassword = () => {
   border-radius: 8px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
 }
 
 :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+  border-color: #CBD5E1;
 }
 
 :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
-  border-color: #1e3c72;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1), 0 4px 12px rgba(30, 58, 138, 0.15);
+  border-color: #1E3A8A;
 }
 
 :deep(.el-tag--success) {
-  background: linear-gradient(135deg, #e6f7e6 0%, #f0f9f0 100%);
-  border-color: rgba(82, 196, 26, 0.2);
-  color: #52c41a;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.2);
+  color: #059669;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 :deep(.el-tag--danger) {
-  background: linear-gradient(135deg, #fff1f0 0%, #fff7f6 100%);
-  border-color: rgba(255, 77, 79, 0.2);
-  color: #ff4d4f;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #DC2626;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
-@media (max-width: 992px) {
+/* 响应式设计 */
+@media (max-width: 1024px) {
   .profile-content {
     grid-template-columns: 1fr;
   }
   
   .profile-header {
-    padding: 30px;
+    padding: 36px;
   }
   
   .header-content {
@@ -891,23 +995,96 @@ const handleChangePassword = () => {
   .header-decoration {
     display: none;
   }
+  
+  .user-stats {
+    justify-content: center;
+    margin-top: 20px;
+  }
 }
 
 @media (max-width: 768px) {
   .profile-container {
-    padding: 20px 10px;
+    padding: 24px 12px;
   }
   
   .profile-header {
-    padding: 25px;
+    padding: 28px;
+  }
+  
+  .username {
+    font-size: 28px;
+  }
+  
+  .info-section {
+    padding: 24px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+  }
+  
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px 0;
+  }
+  
+  .info-label {
+    width: 100%;
+    font-size: 14px;
+  }
+  
+  .info-value {
+    font-size: 15px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .action-buttons .el-button {
+    width: 100%;
+  }
+  
+  .password-security-status {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .history-item {
+    padding: 16px;
+  }
+  
+  .history-content {
+    font-size: 14px;
+  }
+  
+  :deep(.el-dialog__body) {
+    padding: 24px;
+  }
+  
+  :deep(.el-dialog__footer) {
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    padding: 24px;
   }
   
   .username {
     font-size: 24px;
   }
   
-  .info-section,
-  .password-section {
+  .stat-item {
+    min-width: 80px;
+    padding: 12px 16px;
+  }
+  
+  .info-section {
     padding: 20px;
   }
   
@@ -915,12 +1092,13 @@ const handleChangePassword = () => {
     font-size: 18px;
   }
   
-  .history-item {
-    padding: 12px;
+  .password-card {
+    padding: 24px;
   }
   
-  .history-content {
-    font-size: 13px;
+  .collection-card,
+  .history-card {
+    padding: 20px;
   }
 }
 </style>

@@ -71,17 +71,17 @@
         <!-- 法律案例 -->
         <section class="content-section">
           <h2 class="section-title">
-            <i class="el-icon-document"></i> 热门法律案例
+            <i class="fa fa-file-text-o"></i> 热门法律案例
           </h2>
           <div class="case-grid">
             <div class="case-card" v-for="(caseItem, index) in cases.slice(0, 6)" :key="index">
               <div class="case-icon">
-                <i class="el-icon-collection-tag"></i>
+                <i class="fa fa-balance-scale"></i>
               </div>
               <h3 class="case-title">{{ caseItem.title }}</h3>
               <p class="case-summary">{{ caseItem.content }}</p>
               <div class="case-meta">
-                <span><i class="el-icon-time"></i> {{ caseItem.publishTime }}</span>
+                <span><i class="fa fa-clock-o"></i> {{ caseItem.publishTime }}</span>
               </div>
               <div class="case-actions">
                 <el-button size="small" type="text" @click="viewCaseDetail(caseItem.id)">查看详情</el-button>
@@ -98,7 +98,7 @@
         <!-- 法律内容 -->
         <section class="content-section law-content">
           <h2 class="section-title">
-            <i class="el-icon-notebook-1"></i> 法典
+            <i class="fa fa-book"></i> 法典
           </h2>
           <div class="law-list">
             <div class="law-item" v-for="(law, index) in laws" :key="index" @click="viewLawDetail(law.id)">
@@ -109,8 +109,8 @@
                 </el-tag>
               </div>
               <p class="law-item-meta">
-                <i class="el-icon-date"></i> 发布时间：{{ law.publishDate }} | 
-                <i class="el-icon-success"></i> 生效时间：{{ law.effectiveDate }}
+                <i class="fa fa-calendar"></i> 发布时间：{{ law.publishDate }} | 
+                <i class="fa fa-check-circle"></i> 生效时间：{{ law.effectiveDate }}
               </p>
             </div>
           </div>
@@ -122,7 +122,7 @@
             <div class="ai-content">
               <div class="ai-info">
                 <h2 class="ai-title">
-                  <i class="el-icon-chat-line-square"></i> AI法律助手
+                  <i class="fa fa-robot"></i> AI法律助手
                 </h2>
                 <p class="ai-description">
                   我们的AI法律助手基于Spring AI框架，结合阿里云百炼平台的Qwen模型，
@@ -336,21 +336,27 @@ function handleLogout() {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #F8FAFC;
+  font-family: 'Lato', sans-serif;
 }
 
+/* 导航栏 */
 .navbar {
-  background: linear-gradient(to right, #2c3e50, #34495e);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  transition: all 0.3s ease;
 }
 
 .navbar-container {
@@ -358,7 +364,7 @@ function handleLogout() {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  height: 60px;
+  height: 70px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -369,11 +375,19 @@ function handleLogout() {
 .logo {
   font-size: 24px;
   font-weight: bold;
-  color: #fff;
+  color: #1E3A8A;
   text-decoration: none;
   white-space: nowrap;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  font-family: 'EB Garamond', serif;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo::before {
+  content: '⚖️';
+  font-size: 28px;
 }
 
 .search-container {
@@ -381,7 +395,7 @@ function handleLogout() {
   align-items: center;
   justify-content: center;
   flex: 1 1 auto;
-  margin: 0 20px;
+  margin: 0 30px;
   min-width: 200px;
   max-width: 400px;
 }
@@ -389,58 +403,82 @@ function handleLogout() {
 .search-input {
   width: 100%;
   margin-right: 0;
-  border-radius: 4px 0 0 4px;
+  border-radius: 8px 0 0 8px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+  border-color: #1E3A8A;
 }
 
 .search-btn {
-  padding: 0 16px;
-  border-radius: 0 4px 4px 0;
+  padding: 0 20px;
+  border-radius: 0 8px 8px 0;
   margin-left: -1px;
   flex-shrink: 0;
+  background: #1E3A8A;
+  border-color: #1E3A8A;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #1E40AF;
+  border-color: #1E40AF;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   flex-shrink: 0;
 }
 
 .nav-link {
   text-decoration: none;
-  color: #fff;
+  color: #475569;
   font-size: 16px;
-  transition: color 0.3s;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  font-weight: 500;
+  transition: all 0.3s ease;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 12px;
   vertical-align: middle;
+  position: relative;
 }
 
 .nav-link:hover {
-  color: #3498db;
+  color: #1E3A8A;
 }
 
 .nav-link.router-link-active {
-  color: #3498db;
-  font-weight: 500;
+  color: #1E3A8A;
+  font-weight: 600;
 }
 
-.nav-link.router-link-exact-active {
-  color: #3498db;
-  font-weight: 500;
+.nav-link.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #B45309;
+  border-radius: 2px;
 }
 
 .logout-btn {
-  color: #fff;
+  color: #475569;
   font-size: 16px;
-  transition: color 0.3s;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  padding: 0 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0 12px;
   margin: 0;
   white-space: nowrap;
   display: inline-flex;
@@ -453,28 +491,24 @@ function handleLogout() {
   font-family: inherit;
   line-height: 1;
   vertical-align: middle;
+  gap: 4px;
 }
 
 .logout-btn:hover {
-  color: #3498db;
+  color: #1E3A8A;
   background: transparent;
 }
 
-.password-tip {
-  font-size: 12px;
-  color: #999;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
 .main-content {
-  margin-top: 60px;
+  margin-top: 70px;
   flex: 1;
 }
 
+/* 轮播图 */
 .carousel {
-  height: 400px;
+  height: 500px;
   background-color: #f0f2f5;
+  overflow: hidden;
 }
 
 .carousel-content {
@@ -490,33 +524,79 @@ function handleLogout() {
   align-items: center;
   color: white;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.carousel-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+  z-index: 1;
+}
+
+.carousel-content > * {
+  position: relative;
+  z-index: 2;
 }
 
 .carousel-title {
-  font-size: 36px;
+  font-size: 48px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   color: white;
+  font-family: 'EB Garamond', serif;
+  line-height: 1.2;
+  max-width: 800px;
 }
 
 .carousel-subtitle {
-  font-size: 18px;
-  color: white;
-  margin-bottom: 30px;
+  font-size: 20px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 40px;
+  max-width: 600px;
+  line-height: 1.5;
 }
 
+.carousel-btn {
+  background: #B45309 !important;
+  border-color: #B45309 !important;
+  color: white !important;
+  padding: 12px 32px !important;
+  border-radius: 8px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.carousel-btn:hover {
+  background: #92400E !important;
+  border-color: #92400E !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3) !important;
+}
+
+/* 内容区域 */
 .content-section {
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 60px auto;
   padding: 0 20px;
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   position: relative;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+  color: #1E3A8A;
+  font-family: 'EB Garamond', serif;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .section-title::after {
@@ -524,27 +604,29 @@ function handleLogout() {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 80px;
+  width: 100px;
   height: 4px;
-  background: linear-gradient(to right, #1e3c72, #2a5298);
+  background: #B45309;
   border-radius: 2px;
 }
 
+/* 案例卡片 */
 .case-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 25px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
 }
 
 .case-card {
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 30px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  border: 1px solid #E2E8F0;
 }
 
 .case-card::before {
@@ -554,32 +636,41 @@ function handleLogout() {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, #1e3c72, #2a5298);
+  background: linear-gradient(to right, #1E3A8A, #1E40AF);
 }
 
 .case-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+  border-color: #CBD5E1;
 }
 
 .case-icon {
-  font-size: 24px;
-  color: #1e3c72;
-  margin-bottom: 15px;
+  font-size: 28px;
+  color: #1E3A8A;
+  margin-bottom: 20px;
+  width: 56px;
+  height: 56px;
+  background: rgba(30, 58, 138, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .case-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  margin-bottom: 12px;
-  color: #333;
+  margin-bottom: 16px;
+  color: #1E3A8A;
   line-height: 1.4;
+  font-family: 'EB Garamond', serif;
 }
 
 .case-summary {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 15px;
+  font-size: 15px;
+  color: #64748B;
+  margin-bottom: 20px;
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -588,12 +679,12 @@ function handleLogout() {
 }
 
 .case-meta {
-  font-size: 12px;
-  color: #999;
+  font-size: 13px;
+  color: #94A3B8;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .case-actions {
@@ -601,38 +692,67 @@ function handleLogout() {
   justify-content: flex-end;
 }
 
+.case-actions .el-button {
+  color: #1E3A8A;
+  border-color: #1E3A8A;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.case-actions .el-button:hover {
+  background: #1E3A8A;
+  color: white;
+}
+
 .case-more {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
-.more-link {
-  text-decoration: none;
+.more-link .el-button {
+  background: transparent;
+  border-color: #1E3A8A;
+  color: #1E3A8A;
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.more-link .el-button:hover {
+  background: #1E3A8A;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
 }
 
 .law-content {
-  margin-top: 60px;
+  margin-top: 80px;
 }
 
+/* 法律条文 */
 .law-list {
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
   overflow: hidden;
+  border: 1px solid #E2E8F0;
 }
 
 .law-item {
-  padding: 20px 25px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 24px 30px;
+  border-bottom: 1px solid #F1F5F9;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
 }
 
 .law-item:hover {
-  background-color: #f9f9f9;
+  background-color: #F8FAFC;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-left: 4px solid #1E3A8A;
 }
 
 .law-item:last-child {
@@ -643,42 +763,85 @@ function handleLogout() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .law-item-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: #1E3A8A;
   margin: 0;
+  font-family: 'EB Garamond', serif;
+  flex: 1;
+  margin-right: 16px;
+}
+
+.law-item-header .el-tag {
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.law-item-header .el-tag--success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10B981;
+  color: #059669;
+}
+
+.law-item-header .el-tag--info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3B82F6;
+  color: #2563EB;
 }
 
 .law-item-meta {
-  font-size: 13px;
-  color: #999;
+  font-size: 14px;
+  color: #94A3B8;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
+.law-item-meta i {
+  margin-right: 6px;
+}
+
+/* AI助手 */
 .ai-assistant {
-  margin-top: 60px;
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  padding: 60px 0;
+  margin-top: 80px;
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+  padding: 80px 0;
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-assistant::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+  z-index: 1;
 }
 
 .ai-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .ai-content {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 60px;
 }
 
 .ai-info {
@@ -686,38 +849,41 @@ function handleLogout() {
 }
 
 .ai-title {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   color: white;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: 'EB Garamond', serif;
 }
 
 .ai-description {
   font-size: 18px;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   line-height: 1.7;
+  max-width: 600px;
 }
 
 .ai-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 15px 30px;
-  border-radius: 30px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.3s;
+  background: #B45309 !important;
+  color: white !important;
+  border: none !important;
+  padding: 14px 36px !important;
+  border-radius: 8px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3) !important;
 }
 
 .ai-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  border: 2px solid rgba(255,255,255,0.5);
+  background: #92400E !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(180, 83, 9, 0.4) !important;
 }
 
 .ai-image {
@@ -728,22 +894,35 @@ function handleLogout() {
 
 @keyframes float {
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
+  50% { transform: translateY(-20px); }
   100% { transform: translateY(0px); }
 }
 
 .ai-image-img {
   max-width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  border: 4px solid rgba(255,255,255,0.2);
 }
 
+/* 页脚 */
 .footer {
-  background: linear-gradient(to right, #2c3e50, #34495e);
+  background: #0F172A;
   color: #fff;
-  padding: 50px 0 20px;
-  margin-top: 60px;
+  padding: 60px 0 30px;
+  margin-top: 80px;
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #1E3A8A, #B45309);
 }
 
 .footer-container {
@@ -758,18 +937,32 @@ function handleLogout() {
 .footer-column h3 {
   font-size: 20px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   color: #fff;
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: 'EB Garamond', serif;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.footer-column h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: #B45309;
+  border-radius: 2px;
 }
 
 .footer-column p,
 .footer-column li {
-  font-size: 14px;
-  line-height: 1.7;
-  color: #ccc;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #94A3B8;
 }
 
 .footer-column ul {
@@ -778,30 +971,36 @@ function handleLogout() {
 }
 
 .footer-column li {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.footer-column li i {
+  margin-top: 4px;
+  color: #B45309;
 }
 
 .footer-column a {
-  color: #ccc;
+  color: #94A3B8;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
   display: block;
 }
 
 .footer-column a:hover {
-  color: #1890ff;
+  color: #B45309;
+  transform: translateX(5px);
 }
 
 .footer-bottom {
   text-align: center;
-  padding-top: 30px;
-  margin-top: 30px;
-  border-top: 1px solid #444;
-  font-size: 13px;
-  color: #999;
+  padding-top: 40px;
+  margin-top: 40px;
+  border-top: 1px solid #1E293B;
+  font-size: 14px;
+  color: #64748B;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -810,15 +1009,31 @@ function handleLogout() {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .ai-content {
+    gap: 40px;
+  }
+  
+  .carousel-title {
+    font-size: 40px;
+  }
+  
+  .case-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
     height: auto;
     padding: 15px 20px;
+    gap: 15px;
   }
 
   .search-container {
-    margin: 15px 0;
+    margin: 0;
     width: 100%;
     flex: 1 1 100%;
   }
@@ -828,7 +1043,7 @@ function handleLogout() {
   }
 
   .nav-links {
-    margin-top: 15px;
+    margin-top: 10px;
     flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
@@ -839,11 +1054,11 @@ function handleLogout() {
   }
 
   .carousel {
-    height: 350px;
+    height: 400px;
   }
 
   .carousel-title {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   .carousel-subtitle {
@@ -856,16 +1071,64 @@ function handleLogout() {
   }
 
   .ai-image {
-    margin-top: 30px;
+    margin-top: 40px;
   }
 
   .case-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .content-section {
+    margin: 40px auto;
+  }
+
+  .law-content {
+    margin-top: 60px;
+  }
+
+  .ai-assistant {
+    margin-top: 60px;
+    padding: 60px 0;
   }
 
   .footer-container {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .ai-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel {
+    height: 350px;
+  }
+  
+  .carousel-title {
+    font-size: 28px;
+  }
+  
+  .case-card {
+    padding: 24px;
+  }
+  
+  .law-item {
+    padding: 20px 24px;
+  }
+  
+  .ai-assistant {
+    padding: 40px 0;
+  }
+  
+  .footer {
+    padding: 40px 0 20px;
   }
 }
 </style>
