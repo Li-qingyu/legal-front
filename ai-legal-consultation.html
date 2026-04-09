@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI法律咨询 - 智能法律助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E3A8A',
+                        secondary: '#1E40AF',
+                        cta: '#B45309',
+                        background: '#F8FAFC',
+                        text: '#0F172A'
+                    },
+                    fontFamily: {
+                        garamond: ['EB Garamond', 'serif'],
+                        lato: ['Lato', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background font-lato text-text">
+    <!-- 导航栏 -->
+    <nav class="fixed top-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-md z-50 transition-smooth">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-balance-scale text-primary text-2xl mr-2"></i>
+                        <span class="font-garamond font-bold text-xl text-primary">AI法律助手</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-primary transition-smooth">首页</a>
+                    <a href="#features" class="text-gray-600 hover:text-primary transition-smooth">功能</a>
+                    <a href="#about" class="text-gray-600 hover:text-primary transition-smooth">关于我们</a>
+                    <a href="#contact" class="text-gray-600 hover:text-primary transition-smooth">联系我们</a>
+                    <button class="bg-cta hover:bg-amber-700 text-white px-6 py-2 rounded-lg transition-smooth font-medium">
+                        立即咨询
+                    </button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-gray-500 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="font-garamond font-bold text-4xl md:text-5xl lg:text-6xl text-primary mb-6 text-shadow">
+                        智能法律助手<br>
+                        <span class="text-cta">24小时在线咨询</span>
+                    </h1>
+                    <p class="text-gray-600 text-lg mb-8 leading-relaxed">
+                        利用先进的AI技术，为您提供专业的法律咨询服务。无论是合同审查、权益保障还是法律建议，我们都能为您提供及时、准确的法律支持。
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-cta hover:bg-amber-700 text-white px-8 py-3 rounded-lg transition-smooth font-medium text-lg">
+                            开始咨询
+                        </button>
+                        <button class="border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-lg transition-smooth font-medium text-lg">
+                            了解更多
+                        </button>
+                    </div>
+                    <div class="mt-10 flex items-center space-x-6">
+                        <div class="flex -space-x-2">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20person%20avatar&image_size=square" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20person%20avatar&image_size=square" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20person%20avatar&image_size=square" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                            </div>
+                            <p class="text-sm text-gray-600">超过 10,000+ 用户的信赖选择</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="relative">
+                        <div class="absolute -top-4 -left-4 w-full h-full bg-primary/10 rounded-2xl"></div>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20legal%20assistant%20interface%20with%20chat%20bot%20and%20legal%20documents&image_size=landscape_16_9" alt="AI法律咨询界面" class="relative z-10 rounded-2xl shadow-xl w-full">
+                        <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg z-20">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-green-100 text-green-600 p-2 rounded-full">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">咨询已解决</p>
+                                    <p class="text-sm text-gray-500">98% 客户满意度</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 信任徽章 -->
+    <section class="py-10 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 mb-8">受到行业领先机构的信任</p>
+            <div class="flex flex-wrap justify-center items-center space-x-8 space-y-4">
+                <div class="text-gray-400 hover:text-primary transition-smooth">
+                    <i class="fa fa-building text-3xl"></i>
+                    <p class="mt-2 text-sm">法律协会</p>
+                </div>
+                <div class="text-gray-400 hover:text-primary transition-smooth">
+                    <i class="fa fa-university text-3xl"></i>
+                    <p class="mt-2 text-sm">知名律所</p>
+                </div>
+                <div class="text-gray-400 hover:text-primary transition-smooth">
+                    <i class="fa fa-briefcase text-3xl"></i>
+                    <p class="mt-2 text-sm">企业客户</p>
+                </div>
+                <div class="text-gray-400 hover:text-primary transition-smooth">
+                    <i class="fa fa-users text-3xl"></i>
+                    <p class="mt-2 text-sm">个人用户</p>
+                </div>
+                <div class="text-gray-400 hover:text-primary transition-smooth">
+                    <i class="fa fa-shield text-3xl"></i>
+                    <p class="mt-2 text-sm">安全认证</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-garamond font-bold text-3xl md:text-4xl text-primary mb-4">核心功能</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">我们的AI法律助手提供全方位的法律服务，满足您的各种法律需求</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-file-text-o text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">合同审查</h3>
+                    <p class="text-gray-600">快速分析合同条款，识别潜在风险，提供专业修改建议，保障您的合法权益。</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-comments-o text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">在线咨询</h3>
+                    <p class="text-gray-600">24小时在线解答法律问题，提供专业法律建议，为您的决策提供法律支持。</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-search text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">法律检索</h3>
+                    <p class="text-gray-600">智能检索法律法规和案例，为您提供最新、最相关的法律信息。</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-balance-scale text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">权益保障</h3>
+                    <p class="text-gray-600">分析您的法律权益，提供针对性的保障方案，帮助您维护自身合法权益。</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-clock-o text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">快速响应</h3>
+                    <p class="text-gray-600">平均响应时间小于30秒，让您在紧急情况下快速获得法律支持。</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-lock text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">隐私保护</h3>
+                    <p class="text-gray-600">采用银行级加密技术，确保您的法律信息安全，保护您的隐私。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 咨询流程 -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-garamond font-bold text-3xl md:text-4xl text-primary mb-4">咨询流程</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">简单三步，快速获取专业法律建议</p>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="md:w-1/3 text-center mb-10 md:mb-0">
+                    <div class="relative w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        1
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">描述问题</h3>
+                    <p class="text-gray-600">详细描述您的法律问题，上传相关文件</p>
+                </div>
+                <div class="hidden md:block w-1/3">
+                    <div class="h-1 bg-gray-200 relative">
+                        <div class="absolute top-0 left-0 w-full h-full bg-primary"></div>
+                    </div>
+                </div>
+                <div class="md:w-1/3 text-center mb-10 md:mb-0">
+                    <div class="relative w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        2
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">AI分析</h3>
+                    <p class="text-gray-600">AI智能分析您的问题，匹配相关法律知识</p>
+                </div>
+                <div class="hidden md:block w-1/3">
+                    <div class="h-1 bg-gray-200 relative">
+                        <div class="absolute top-0 left-0 w-full h-full bg-primary"></div>
+                    </div>
+                </div>
+                <div class="md:w-1/3 text-center">
+                    <div class="relative w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        3
+                    </div>
+                    <h3 class="font-garamond font-semibold text-xl mb-3">获取建议</h3>
+                    <p class="text-gray-600">获得专业法律建议和解决方案</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 客户评价 -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-garamond font-bold text-3xl md:text-4xl text-primary mb-4">客户评价</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">听听我们的客户怎么说</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="flex items-center mb-4">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20businessman%20avatar&image_size=square" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-medium">张先生</h4>
+                            <p class="text-sm text-gray-500">企业主</p>
+                        </div>
+                    </div>
+                    <div class="flex mb-4">
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600">"AI法律助手帮我快速审查了一份重要合同，发现了几个潜在风险点，避免了可能的法律纠纷。响应速度快，建议专业，非常值得推荐！"</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="flex items-center mb-4">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20businesswoman%20avatar&image_size=square" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-medium">李女士</h4>
+                            <p class="text-sm text-gray-500">职场人士</p>
+                        </div>
+                    </div>
+                    <div class="flex mb-4">
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600">"作为一名普通职场人士，我对法律知识了解不多。AI法律助手用通俗易懂的语言解答了我的问题，让我明白了自己的权益，非常感谢！"</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-smooth">
+                    <div class="flex items-center mb-4">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20middle%20aged%20man%20avatar&image_size=square" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-medium">王先生</h4>
+                            <p class="text-sm text-gray-500">创业者</p>
+                        </div>
+                    </div>
+                    <div class="flex mb-4">
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star text-yellow-400"></i>
+                        <i class="fa fa-star-half-o text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600">"在创业过程中，遇到了很多法律问题。AI法律助手为我提供了及时的法律建议，帮助我规避了很多风险，是我创业路上的好帮手。"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA 区域 -->
+    <section class="py-20 bg-primary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-garamond font-bold text-3xl md:text-4xl mb-6">立即开始您的法律咨询</h2>
+            <p class="text-white/80 max-w-2xl mx-auto mb-10">无论您遇到什么法律问题，我们的AI法律助手都能为您提供专业、及时的支持</p>
+            <button class="bg-cta hover:bg-amber-700 text-white px-10 py-4 rounded-lg transition-smooth font-medium text-lg">
+                免费咨询
+            </button>
+            <p class="mt-6 text-white/60 text-sm">首次咨询免费，无任何隐藏费用</p>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fa fa-balance-scale text-2xl mr-2"></i>
+                        <span class="font-garamond font-bold text-xl">AI法律助手</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">智能法律咨询平台，为您提供专业、及时的法律支持</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-smooth">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-smooth">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-smooth">
+                            <i class="fa fa-qq text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">服务</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">合同审查</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">在线咨询</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">法律检索</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">权益保障</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">关于我们</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">公司简介</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">团队介绍</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-smooth">加入我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">联系方式</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fa fa-phone mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">400-123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">contact@ailegal.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-map-marker mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">北京市朝阳区法律大厦</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2026 AI法律助手. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+                nav.classList.remove('shadow-md');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.add('shadow-md');
+            }
+        });
+    </script>
+</body>
+</html>
