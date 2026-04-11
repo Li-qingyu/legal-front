@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>法律AI助手</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E3A8A',
+            secondary: '#1E40AF',
+            cta: '#B45309',
+            background: '#F8FAFC',
+            text: '#0F172A',
+          },
+          fontFamily: {
+            serif: ['EB Garamond', 'serif'],
+            sans: ['Lato', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-thin {
+        scrollbar-width: thin;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 4px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+      }
+      .transition-smooth {
+        transition: all 0.2s ease-in-out;
+      }
+    }
+  </style>
+</head>
+<body class="bg-background min-h-screen font-sans text-text">
+  <div class="flex h-screen overflow-hidden">
+    <!-- 左侧功能栏 -->
+    <div id="sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out">
+      <!-- 顶部品牌 -->
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+        <h1 class="text-xl font-serif font-bold text-primary">法律AI助手</h1>
+        <button id="toggleSidebar" class="text-gray-400 hover:text-primary transition-smooth">
+          <i class="fa fa-chevron-left"></i>
+        </button>
+      </div>
+
+      <!-- 功能菜单 -->
+      <div class="p-4">
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 sidebar-text">功能</h2>
+        <div class="space-y-1">
+          <button id="lawStudyBtn" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-primary transition-smooth">
+            <i class="fa fa-book mr-3"></i>
+            <span class="sidebar-text">法律学习</span>
+          </button>
+          <button id="lawConsultBtn" class="w-full flex items-center px-4 py-3 rounded-lg bg-blue-50 text-primary transition-smooth">
+            <i class="fa fa-comments mr-3"></i>
+            <span class="sidebar-text">法律咨询</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 历史对话 -->
+      <div class="flex-1 p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider sidebar-text">历史对话</h2>
+          <button class="text-gray-400 hover:text-primary transition-smooth">
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+        <div class="space-y-2">
+          <div class="p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition-smooth cursor-pointer sidebar-text">
+            <div class="flex justify-between items-start">
+              <h3 class="font-medium text-sm">劳动合同问题</h3>
+              <span class="text-xs text-gray-400">今天 09:00</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 line-clamp-2">关于劳动合同解除的相关法律规定...</p>
+          </div>
+          <div class="p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition-smooth cursor-pointer sidebar-text">
+            <div class="flex justify-between items-start">
+              <h3 class="font-medium text-sm">离婚财产分割</h3>
+              <span class="text-xs text-gray-400">昨天 14:30</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 line-clamp-2">离婚时财产如何分割...</p>
+          </div>
+          <div class="p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition-smooth cursor-pointer sidebar-text">
+            <div class="flex justify-between items-start">
+              <h3 class="font-medium text-sm">交通事故责任</h3>
+              <span class="text-xs text-gray-400">3天前</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 line-clamp-2">交通事故责任如何认定...</p>
+          </div>
+          <div class="p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition-smooth cursor-pointer sidebar-text">
+            <div class="flex justify-between items-start">
+              <h3 class="font-medium text-sm">合同纠纷</h3>
+              <span class="text-xs text-gray-400">1周前</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 line-clamp-2">合同纠纷如何处理...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部用户信息 -->
+      <div class="p-4 border-t border-gray-200">
+        <div class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="ml-3 sidebar-text">
+            <h3 class="text-sm font-medium">用户</h3>
+            <p class="text-xs text-gray-500">普通用户</p>
+          </div>
+          <button class="ml-auto text-gray-400 hover:text-primary transition-smooth">
+            <i class="fa fa-cog"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧对话区域 -->
+    <div class="flex-1 flex flex-col">
+      <!-- 顶部标题 -->
+      <div class="bg-white border-b border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-serif font-bold">法律咨询</h2>
+          <div class="flex space-x-3">
+            
+            <button class="text-gray-400 hover:text-primary transition-smooth">
+              <i class="fa fa-ellipsis-v"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI形象区域 -->
+      <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-center">
+        <div class="flex flex-col items-center">
+          <div id="aiAvatar" class="w-32 h-32 mb-3">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <!-- 头部 -->
+              <circle cx="50" cy="40" r="30" fill="#f0f0f0" stroke="#1E3A8A" stroke-width="2"/>
+              <!-- 眼睛 -->
+              <circle cx="40" cy="35" r="5" fill="#1E3A8A"/>
+              <circle cx="60" cy="35" r="5" fill="#1E3A8A"/>
+              <!-- 嘴巴 -->
+              <path d="M40 50 Q50 60 60 50" stroke="#1E3A8A" stroke-width="2" fill="none"/>
+              <!-- 身体 -->
+              <rect x="35" y="70" width="30" height="20" fill="#1E3A8A" rx="5"/>
+              <!-- 手臂 -->
+              <rect x="25" y="70" width="10" height="15" fill="#1E3A8A" rx="2"/>
+              <rect x="65" y="70" width="10" height="15" fill="#1E3A8A" rx="2"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <h3 class="font-medium text-primary">法律智能助手</h3>
+            <p class="text-xs text-gray-500">专业法律知识，实时解答</p>
+            <button id="voiceButton" class="mt-2 text-primary hover:text-secondary transition-smooth" title="语音模式">
+              <i class="fa fa-volume-up"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 对话历史 -->
+      <div id="chatHistory" class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
+        <!-- AI欢迎消息 -->
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div class="ml-4 max-w-[80%]">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-gray-800">您好！我是法律智能助手，很高兴为您提供法律咨询服务。请问有什么法律问题需要帮助？</p>
+            </div>
+            <div class="text-xs text-gray-500 mt-1">09:00</div>
+          </div>
+        </div>
+
+        <!-- 用户消息示例 -->
+        <div class="flex items-start justify-end">
+          <div class="mr-4 max-w-[80%]">
+            <div class="bg-primary text-white rounded-lg p-4 shadow-sm">
+              <p>我想了解一下劳动合同解除的相关法律规定</p>
+            </div>
+            <div class="text-xs text-gray-500 mt-1 text-right">09:01</div>
+          </div>
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+            <i class="fa fa-user"></i>
+          </div>
+        </div>
+
+        <!-- AI回复示例 -->
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div class="ml-4 max-w-[80%]">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-gray-800">根据《中华人民共和国劳动合同法》，劳动合同解除主要有以下几种情况：</p>
+              <ul class="list-disc pl-5 mt-3 space-y-2">
+                <li>双方协商一致解除</li>
+                <li>劳动者提前通知解除（试用期内提前3日，正式期提前30日）</li>
+                <li>用人单位因劳动者过错解除</li>
+                <li>用人单位因客观情况变化解除</li>
+                <li>经济性裁员</li>
+              </ul>
+              <p class="mt-3">请问您具体遇到了什么问题？</p>
+            </div>
+            <div class="text-xs text-gray-500 mt-1">09:02</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 输入区域 -->
+      <div class="bg-white border-t border-gray-200 p-4">
+        <div class="flex items-center space-x-3">
+          <button id="uploadButton" class="text-gray-400 hover:text-primary transition-smooth hidden">
+            <i class="fa fa-upload"></i>
+            <input type="file" class="hidden" id="fileInput" multiple>
+          </button>
+         
+          <input 
+            type="text" 
+            id="userInput" 
+            placeholder="请输入您的法律问题..." 
+            class="flex-1 border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+          <button id="sendButton" class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-secondary transition-smooth">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </div>
+        <div class="mt-3 flex justify-center space-x-6 text-sm text-gray-500">
+          <button class="hover:text-primary transition-smooth">
+            <i class="fa fa-history mr-1"></i> 历史记录
+          </button>
+          <button class="hover:text-primary transition-smooth">
+            <i class="fa fa-trash mr-1"></i> 清空对话
+          </button>
+          <button class="hover:text-primary transition-smooth">
+            <i class="fa fa-save mr-1"></i> 保存对话
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 左侧栏切换逻辑
+    const sidebar = document.getElementById('sidebar');
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const sidebarText = document.querySelectorAll('.sidebar-text');
+    
+    toggleSidebar.addEventListener('click', function() {
+      if (sidebar.classList.contains('w-64')) {
+        // 收起左侧栏
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-16');
+        toggleSidebar.innerHTML = '<i class="fa fa-chevron-right"></i>';
+        sidebarText.forEach(element => {
+          element.classList.add('hidden');
+        });
+      } else {
+        // 展开左侧栏
+        sidebar.classList.remove('w-16');
+        sidebar.classList.add('w-64');
+        toggleSidebar.innerHTML = '<i class="fa fa-chevron-left"></i>';
+        sidebarText.forEach(element => {
+          element.classList.remove('hidden');
+        });
+      }
+    });
+
+    // 功能切换逻辑
+    const lawStudyBtn = document.getElementById('lawStudyBtn');
+    const lawConsultBtn = document.getElementById('lawConsultBtn');
+    const uploadButton = document.getElementById('uploadButton');
+    const fileInput = document.getElementById('fileInput');
+    const voiceButton = document.getElementById('voiceButton');
+    const aiAvatar = document.getElementById('aiAvatar');
+
+    // 切换到法律学习模式
+    lawStudyBtn.addEventListener('click', function() {
+      lawStudyBtn.classList.add('bg-blue-50', 'text-primary');
+      lawStudyBtn.classList.remove('text-gray-700');
+      lawConsultBtn.classList.remove('bg-blue-50', 'text-primary');
+      lawConsultBtn.classList.add('text-gray-700');
+      uploadButton.classList.remove('hidden');
+      document.querySelector('h2.text-lg.font-serif').textContent = '法律学习';
+    });
+
+    // 切换到法律咨询模式
+    lawConsultBtn.addEventListener('click', function() {
+      lawConsultBtn.classList.add('bg-blue-50', 'text-primary');
+      lawConsultBtn.classList.remove('text-gray-700');
+      lawStudyBtn.classList.remove('bg-blue-50', 'text-primary');
+      lawStudyBtn.classList.add('text-gray-700');
+      uploadButton.classList.add('hidden');
+      document.querySelector('h2.text-lg.font-serif').textContent = '法律咨询';
+    });
+
+    // 文件上传功能
+    uploadButton.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        const fileName = files[0].name;
+        addMessage('user', `[文件] ${fileName}`);
+        
+        // 模拟AI回复
+        setTimeout(() => {
+          addMessage('ai', `已收到文件 ${fileName}，我将为您分析相关法律内容。`);
+        }, 1000);
+      }
+    });
+
+    // 语音模式切换
+    let voiceEnabled = false;
+    voiceButton.addEventListener('click', function() {
+      if ('speechSynthesis' in window) {
+        if (!voiceEnabled) {
+          // 开启语音模式
+          voiceEnabled = true;
+          voiceButton.innerHTML = '<i class="fa fa-volume-off"></i>';
+          voiceButton.title = '关闭语音模式';
+          
+          const utterance = new SpeechSynthesisUtterance('语音模式已开启，我将为您朗读回复内容。');
+          utterance.lang = 'zh-CN';
+          speechSynthesis.speak(utterance);
+          
+          // 简单的语音动画效果
+          aiAvatar.classList.add('animate-pulse');
+          setTimeout(() => {
+            aiAvatar.classList.remove('animate-pulse');
+          }, 2000);
+        } else {
+          // 关闭语音模式
+          voiceEnabled = false;
+          voiceButton.innerHTML = '<i class="fa fa-volume-up"></i>';
+          voiceButton.title = '语音模式';
+          
+          const utterance = new SpeechSynthesisUtterance('语音模式已关闭。');
+          utterance.lang = 'zh-CN';
+          speechSynthesis.speak(utterance);
+        }
+      } else {
+        alert('您的浏览器不支持语音合成功能');
+      }
+    });
+
+    // 模拟对话功能
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const userInput = document.getElementById('userInput');
+      const message = userInput.value.trim();
+      
+      if (message) {
+        // 添加用户消息
+        addMessage('user', message);
+        userInput.value = '';
+        
+        // 模拟AI回复
+        setTimeout(() => {
+          const isLawStudyMode = lawStudyBtn.classList.contains('bg-blue-50');
+          let reply;
+          
+          if (isLawStudyMode) {
+            reply = '这是法律学习模式的回复。我将为您提供相关法律知识的详细解释和学习资源。';
+          } else {
+            reply = '感谢您的咨询。这是一个模拟回复，实际应用中会根据您的问题提供专业的法律建议。';
+          }
+          
+          addMessage('ai', reply);
+          
+          // 如果语音模式开启，朗读回复内容
+          if (voiceEnabled && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(reply);
+            utterance.lang = 'zh-CN';
+            speechSynthesis.speak(utterance);
+            
+            // 语音动画效果
+            aiAvatar.classList.add('animate-pulse');
+            setTimeout(() => {
+              aiAvatar.classList.remove('animate-pulse');
+            }, 2000);
+          }
+        }, 1000);
+      }
+    }
+
+    function addMessage(type, content) {
+      const chatHistory = document.getElementById('chatHistory');
+      const now = new Date();
+      const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      
+      let messageHTML;
+      if (type === 'user') {
+        messageHTML = `
+          <div class="flex items-start justify-end">
+            <div class="mr-4 max-w-[80%]">
+              <div class="bg-primary text-white rounded-lg p-4 shadow-sm">
+                <p>${content}</p>
+              </div>
+              <div class="text-xs text-gray-500 mt-1 text-right">${time}</div>
+            </div>
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
+        `;
+      } else {
+        messageHTML = `
+          <div class="flex items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+              <i class="fa fa-robot"></i>
+            </div>
+            <div class="ml-4 max-w-[80%]">
+              <div class="bg-white rounded-lg p-4 shadow-sm">
+                <p class="text-gray-800">${content}</p>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">${time}</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      chatHistory.insertAdjacentHTML('beforeend', messageHTML);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+  </script>
+</body>
+</html>
