@@ -39,7 +39,8 @@ const router = createRouter({
         { path: 'law/detail/:id', name: 'userLawDetail', component: () => import('@/views/user/law/detail.vue') },
         { path: 'ai', name: 'userAi', component: UserAiView},
         { path: 'collection', name: 'userCollection', component: UserCollectionView},
-        { path: 'profile', name: 'userProfile', component: UserProfileView}
+        { path: 'profile', name: 'userProfile', component: UserProfileView},
+        { path: 'search', name: 'userSearch', component: () => import('@/views/user/search/index.vue') }
       ]
     },
     {

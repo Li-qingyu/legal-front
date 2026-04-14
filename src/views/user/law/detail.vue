@@ -104,7 +104,20 @@ async function loadLawArticleInfo() {
 
 // 返回列表
 function goBack() {
-  router.back();
+  // 检查是否从搜索页面跳转过来
+  const fromSearch = route.query.fromSearch;
+  if (fromSearch === 'true') {
+    router.push({
+      path: '/user/search',
+      query: {
+        keyword: route.query.keyword,
+        page: route.query.page,
+        pageSize: route.query.pageSize
+      }
+    });
+  } else {
+    router.back();
+  }
 }
 </script>
 

@@ -128,12 +128,25 @@ async function loadCaseDetail(id) {
 
 // 返回列表页
 function goBack() {
-  // 检查是否从收藏页面跳转过来
-  const from = route.query.from;
-  if (from === 'collection') {
-    router.push('/user/collection');
+  // 检查是否从搜索页面跳转过来
+  const fromSearch = route.query.fromSearch;
+  if (fromSearch === 'true') {
+    router.push({
+      path: '/user/search',
+      query: {
+        keyword: route.query.keyword,
+        page: route.query.page,
+        pageSize: route.query.pageSize
+      }
+    });
   } else {
-    router.push('/user/case');
+    // 检查是否从收藏页面跳转过来
+    const from = route.query.from;
+    if (from === 'collection') {
+      router.push('/user/collection');
+    } else {
+      router.push('/user/case');
+    }
   }
 }
 

@@ -255,22 +255,14 @@ async function loadHomeData() {
 }
 
 // 搜索
-async function handleSearch() {
+function handleSearch() {
   if (!searchQuery.value) return;
   
-  loading.value = true;
-  
-  try {
-    const response = await searchLawContentApi(searchQuery.value);
-    // 处理搜索结果
-    console.log('搜索结果:', response.data);
-    // 可以根据需要跳转到搜索结果页面或在当前页面显示结果
-  } catch (err) {
-    error.value = '搜索失败，请重试';
-    console.error('搜索失败:', err);
-  } finally {
-    loading.value = false;
-  }
+  // 跳转到搜索结果页面
+  router.push({
+    path: '/user/search',
+    query: { keyword: searchQuery.value }
+  });
 }
 
 // 查看案例详情
