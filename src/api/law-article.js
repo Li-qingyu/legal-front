@@ -56,3 +56,25 @@ export const importApi = (data) => {
     data
   })
 }
+
+// 同步法律库
+export const syncApi = ( lawBookId) => {
+  return request({
+    url: `/admin/law-articles/sync`,
+    method: 'get',
+    params: {
+      lawBookId
+    }
+  })
+}
+
+// 查询同步状态
+export const getSyncStatusApi = (taskId) => {
+  return request({
+    url: `/admin/law-articles/sync/status`,
+    method: 'get',
+    params: {
+      taskId
+    }
+  })
+}

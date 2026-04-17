@@ -1,5 +1,5 @@
 <script setup>
-import { Avatar, HelpFilled, Histogram, InfoFilled, Menu, Promotion, Tools, SwitchButton, UserFilled } from '@element-plus/icons-vue';
+import { Avatar, HelpFilled, Histogram, InfoFilled, Menu, Promotion, Tools, SwitchButton, UserFilled, Refresh } from '@element-plus/icons-vue';
 import { ref ,onMounted} from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
@@ -59,6 +59,7 @@ const logout=()=>{
                 <el-menu-item index="/admin/type"><el-icon><HelpFilled /></el-icon>法律类型管理</el-menu-item>
                 <el-menu-item index="/admin/law-book"><el-icon><InfoFilled /></el-icon>法律书管理</el-menu-item>
                 <el-menu-item index="/admin/law-article"><el-icon><InfoFilled /></el-icon>法律条文管理</el-menu-item>
+                <el-menu-item index="/admin/sync"><el-icon><Refresh /></el-icon>同步知识库</el-menu-item>
                 <el-menu-item index="/admin/user"><el-icon><UserFilled /></el-icon>用户管理</el-menu-item>
 
             </el-sub-menu>

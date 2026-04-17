@@ -10,6 +10,7 @@ import TypeView from '@/views/admin/type/index.vue'
 import UserView from '@/views/admin/user/index.vue'
 import LawArticleView from '@/views/admin/law-article/index.vue'
 import LawBookView from '@/views/admin/law-book/index.vue'
+import SyncView from '@/views/admin/sync/index.vue'
 import LayoutView from '@/views/admin/layout/index.vue'
 import IndexView from '@/views/admin/index/index.vue'
 import UserCaseView from '@/views/user/case/index.vue'
@@ -56,6 +57,7 @@ const router = createRouter({
         { path: 'type', name: 'type', component: TypeView },
         { path: 'law-article', name: 'law-article', component: LawArticleView },
         { path: 'law-book', name: 'law-book', component: LawBookView },
+        { path: 'sync', name: 'sync', component: SyncView },
       ]
     },
     { path: '/login', name: 'login', component: LoginView },
