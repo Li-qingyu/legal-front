@@ -681,7 +681,7 @@ const toggleCaseStatus = async (id, currentStatus) => {
             :rows="3" 
             placeholder="请输入判决结果（可选）"
             show-word-limit
-            maxlength="500"
+            maxlength="1000"
           />
         </el-form-item>
       </div>
