@@ -4,6 +4,7 @@ import { ElMessage, ElLoading } from 'element-plus';
 import { Refresh, Document, HelpFilled, SuccessFilled, WarningFilled } from '@element-plus/icons-vue';
 import { getAllLawBooksApi } from '@/api/law-book';
 import { syncApi, getSyncStatusApi } from '@/api/law-article';
+import { batchSyncApi, queryTaskStatusApi } from '@/api/case';
 
 // 法律书列表
 const lawBookList = ref([]);
@@ -23,6 +24,7 @@ const syncStatus = ref({
     loading: false,
     success: false,
     error: false,
+    polling: false,
     message: ''
   }
 });
@@ -176,24 +178,103 @@ const syncLawCases = async () => {
   syncStatus.value.lawCase.loading = true;
   syncStatus.value.lawCase.success = false;
   syncStatus.value.lawCase.error = false;
+  syncStatus.value.lawCase.polling = false;
   syncStatus.value.lawCase.message = '正在同步法律案例...';
   
   try {
-    // 模拟同步过程
-    await new Promise(resolve => setTimeout(resolve, 2500));
+    // 调用实际的同步API
+    const response = await batchSyncApi();
     
-    // 这里应该调用实际的同步API
-    // const response = await syncLawCaseApi();
-    
-    syncStatus.value.lawCase.success = true;
-    syncStatus.value.lawCase.message = '法律案例同步成功！';
-    ElMessage.success('法律案例同步成功');
+    if (response.code) {
+      const taskId = response.data;
+      if (taskId) {
+        // 开启轮询
+        syncStatus.value.lawCase.polling = true;
+        syncStatus.value.lawCase.message = '正在处理同步任务...';
+        startCasePolling(taskId);
+      } else {
+        // 没有返回taskId，直接显示成功
+        syncStatus.value.lawCase.success = true;
+        syncStatus.value.lawCase.message = '法律案例同步成功！';
+        ElMessage.success('法律案例同步成功');
+      }
+    } else {
+      syncStatus.value.lawCase.error = true;
+      syncStatus.value.lawCase.message = '法律案例同步失败：' + response.msg;
+      ElMessage.error('法律案例同步失败：' + response.msg);
+    }
   } catch (error) {
     syncStatus.value.lawCase.error = true;
     syncStatus.value.lawCase.message = '法律案例同步失败：' + error.message;
     ElMessage.error('法律案例同步失败');
   } finally {
     syncStatus.value.lawCase.loading = false;
+  }
+};
+
+// 开始轮询法律案例同步状态
+const startCasePolling = (taskId) => {
+  // 清除之前的定时器
+  if (pollingTimer.value) {
+    clearInterval(pollingTimer.value);
+  }
+  
+  // 立即查询一次
+  pollCaseSyncStatus(taskId);
+  
+  // 设置轮询定时器，每1分钟查询一次
+  pollingTimer.value = setInterval(() => {
+    pollCaseSyncStatus(taskId);
+  }, 60000); // 1分钟
+};
+
+// 轮询法律案例同步状态
+const pollCaseSyncStatus = async (taskId) => {
+  try {
+    const response = await queryTaskStatusApi(taskId);
+    
+    if (response.code) {
+      const status = response.data;
+      if (status === 'PROCESSING') {
+        // 仍在处理中，继续轮询
+        syncStatus.value.lawCase.message = '同步任务正在处理中...';
+      } else if (status === 'SUCCESS') {
+        // 同步成功
+        stopPolling();
+        syncStatus.value.lawCase.polling = false;
+        syncStatus.value.lawCase.success = true;
+        syncStatus.value.lawCase.message = '法律案例同步成功！';
+        ElMessage.success('法律案例同步成功');
+      } else if (status === 'FAILED') {
+        // 同步失败
+        stopPolling();
+        syncStatus.value.lawCase.polling = false;
+        syncStatus.value.lawCase.error = true;
+        syncStatus.value.lawCase.message = '法律案例同步失败！';
+        ElMessage.error('法律案例同步失败');
+      } else {
+        // 其他状态
+        stopPolling();
+        syncStatus.value.lawCase.polling = false;
+        syncStatus.value.lawCase.success = true;
+        syncStatus.value.lawCase.message = `法律案例同步完成，状态：${status}`;
+        ElMessage.success(`法律案例同步完成，状态：${status}`);
+      }
+    } else {
+      // API调用失败
+      stopPolling();
+      syncStatus.value.lawCase.polling = false;
+      syncStatus.value.lawCase.error = true;
+      syncStatus.value.lawCase.message = '查询同步状态失败：' + response.msg;
+      ElMessage.error('查询同步状态失败：' + response.msg);
+    }
+  } catch (error) {
+    // 网络错误
+    stopPolling();
+    syncStatus.value.lawCase.polling = false;
+    syncStatus.value.lawCase.error = true;
+    syncStatus.value.lawCase.message = '查询同步状态失败：' + error.message;
+    ElMessage.error('查询同步状态失败');
   }
 };
 </script>
@@ -289,10 +370,12 @@ const syncLawCases = async () => {
           
           <div class="sync-status" :class="{
             'status-loading': syncStatus.lawCase.loading,
+            'status-polling': syncStatus.lawCase.polling,
             'status-success': syncStatus.lawCase.success,
             'status-error': syncStatus.lawCase.error
           }">
             <el-icon v-if="syncStatus.lawCase.loading" class="status-icon"><Refresh /></el-icon>
+            <el-icon v-else-if="syncStatus.lawCase.polling" class="status-icon"><Refresh /></el-icon>
             <el-icon v-else-if="syncStatus.lawCase.success" class="status-icon"><SuccessFilled /></el-icon>
             <el-icon v-else-if="syncStatus.lawCase.error" class="status-icon"><WarningFilled /></el-icon>
             <span>{{ syncStatus.lawCase.message }}</span>

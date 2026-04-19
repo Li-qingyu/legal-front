@@ -59,3 +59,20 @@ export const batchToggleStatusApi = (ids, status) => {
     data: { ids, status }
   });
 };
+
+// 批量同步所有法律案例
+export const batchSyncApi = () => {
+  return request({
+    url: '/admin/case/sync',
+    method: 'post',
+  });
+};
+
+//查询任务状态
+export const queryTaskStatusApi = (taskId) => {
+  return request({
+    url: `/admin/case/sync/status`,
+    method: 'get',
+    params: { taskId }
+  });
+};
