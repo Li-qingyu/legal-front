@@ -13,6 +13,7 @@ import LawBookView from '@/views/admin/law-book/index.vue'
 import SyncView from '@/views/admin/sync/index.vue'
 import LayoutView from '@/views/admin/layout/index.vue'
 import IndexView from '@/views/admin/index/index.vue'
+import AdminProfileView from '@/views/admin/profile/index.vue'
 import UserCaseView from '@/views/user/case/index.vue'
 import UserLawView from '@/views/user/law/index.vue'
 import UserAiView from '@/views/user/ai/index.vue'
@@ -58,6 +59,7 @@ const router = createRouter({
         { path: 'law-article', name: 'law-article', component: LawArticleView },
         { path: 'law-book', name: 'law-book', component: LawBookView },
         { path: 'sync', name: 'sync', component: SyncView },
+        { path: 'profile', name: 'adminProfile', component: AdminProfileView },
       ]
     },
     { path: '/login', name: 'login', component: LoginView },

@@ -42,6 +42,11 @@ const toggleManageMenu = () => {
 const goToUser = () => {
   window.open('/user', '_blank')
 }
+
+// 导航到个人中心
+const goToProfile = () => {
+  router.push('/admin/profile')
+}
 </script>
 
 <template>
@@ -139,7 +144,7 @@ const goToUser = () => {
             <el-icon><Bell /></el-icon>
             <span class="badge">4</span>
           </button>
-          <button class="header-btn">
+          <button class="header-btn" @click="goToProfile">
             <el-icon><Setting /></el-icon>
           </button>
         </div>

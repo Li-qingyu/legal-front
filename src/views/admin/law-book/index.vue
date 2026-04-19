@@ -1073,12 +1073,16 @@ const delByIds = async () => {
 
 /* 对话框样式 */
 :deep(.el-dialog) {
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 48px rgba(45, 59, 53, 0.2);
+  box-shadow: 
+    0 24px 48px rgba(45, 59, 53, 0.2),
+    0 8px 20px rgba(45, 59, 53, 0.1),
+    0 4px 12px rgba(45, 59, 53, 0.08);
   max-width: 640px;
   animation: dialogFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transform-origin: center top;
+  border: 1px solid rgba(201, 169, 98, 0.2);
 }
 
 @keyframes dialogFadeIn {
@@ -1104,12 +1108,14 @@ const delByIds = async () => {
 }
 
 :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, var(--sidebar-bg), #2A4A3F);
-  padding: 20px 24px;
+  background: linear-gradient(135deg, #1E3A2F, #2D4A3F);
+  padding: 24px 28px;
   margin: 0;
   border-bottom: none;
   position: relative;
   overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
 }
 
 :deep(.el-dialog__header::before) {
@@ -1119,8 +1125,7 @@ const delByIds = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.03;
+  background: linear-gradient(135deg, rgba(201, 169, 98, 0.1), transparent);
   pointer-events: none;
 }
 
@@ -1131,30 +1136,38 @@ const delByIds = async () => {
   right: -5%;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(201, 169, 98, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201, 169, 98, 0.3) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   transition: all 0.5s ease;
 }
 
 :deep(.el-dialog__title) {
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 20px;
   font-family: 'Cormorant Garamond', Georgia, serif;
   letter-spacing: 0.5px;
   position: relative;
   z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
 }
 
 :deep(.el-dialog__headerbtn) {
-  top: 18px;
-  right: 18px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :deep(.el-dialog__headerbtn:hover) {
@@ -1164,7 +1177,7 @@ const delByIds = async () => {
 
 :deep(.el-dialog__headerbtn .el-dialog__close) {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 16px;
+  font-size: 18px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 1;
@@ -1176,7 +1189,7 @@ const delByIds = async () => {
 }
 
 :deep(.el-dialog__body) {
-  padding: 28px;
+  padding: 32px;
   background-color: var(--bg-primary);
   animation: bodyFadeIn 0.4s ease 0.1s forwards;
   opacity: 0;
@@ -1194,12 +1207,13 @@ const delByIds = async () => {
 }
 
 :deep(.el-dialog__footer) {
-  padding: 20px 24px;
+  padding: 24px 28px;
   border-top: 1px solid var(--border);
   background-color: var(--bg-secondary);
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
+  border-radius: 0 0 20px 20px;
   animation: footerSlideIn 0.4s ease 0.2s forwards;
   opacity: 0;
 }
