@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, updateStatusApi} from '@/api/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search, Refresh, Plus, Delete, Edit, User, Check, Close, Message, Phone, Upload, Download } from '@element-plus/icons-vue'
 
 
 //搜索表单对象
@@ -215,187 +216,300 @@ const updateUserStatus = async (id, status) => {
 </script>
 
 <template>
-    <!-- 顶部标题 -->
+  <div class="user-management">
+    <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-content">
-        <div class="header-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15C10.9391 15 9.92172 15.4214 9.17157 16.1716C8.42143 16.9217 8 17.9391 8 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div class="header-left">
+          <div class="header-icon">
+            <el-icon><User /></el-icon>
+          </div>
+          <div class="header-text">
+            <h1 class="page-title">用户管理</h1>
+            <p class="page-subtitle">User Management System</p>
+          </div>
         </div>
-        <div class="header-text">
-          <h1 class="page-title">用户管理</h1>
-          <p class="page-subtitle">User Management System</p>
-        </div>
-        <div class="header-decoration">
-          <div class="decoration-line"></div>
-          <div class="decoration-dot"></div>
+        <div class="header-right">
+          <el-button type="primary" @click="addStu();resetForm(stuFormRef)">
+            <el-icon><Plus /></el-icon>
+            添加用户
+          </el-button>
+          <el-button type="danger" @click="delByIds()">
+            <el-icon><Delete /></el-icon>
+            批量删除
+          </el-button>
         </div>
       </div>
     </div>
 
-    <!-- 条件搜索表单 -->
-    <el-form :inline="true" :model="searchStu" class="demo-form-inline">
-      <el-form-item label="用户名">
-        <el-input v-model="searchStu.name" placeholder="搜索用户..."/>
-      </el-form-item>
+    <!-- 搜索容器 -->
+    <div class="search-container">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="section-label">搜索选项</div>
+          <div class="search-items">
+            <div class="search-item">
+              <el-input v-model="searchStu.name" placeholder="搜索用户..." size="large" style="width: 300px;">
+                <template #prefix>
+                  <el-icon class="input-icon"><Search /></el-icon>
+                </template>
+              </el-input>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <el-button type="primary" size="large" @click="queryPage()">
+            <el-icon><Search /></el-icon>
+            搜索
+          </el-button>
+          <el-button type="info" size="large" @click="clear">
+            <el-icon><Refresh /></el-icon>
+            重置
+          </el-button>
+        </div>
+      </div>
+    </div>
 
-      <el-form-item>
-        <el-button type="primary" @click="queryPage()">搜索</el-button>
-      </el-form-item>
-    </el-form>
-    
-    <!-- 功能按钮 -->
-    <el-button type="success" @click="addStu();resetForm(stuFormRef)">添加用户</el-button>
-    <br><br>
-    
-    
-    <!-- 列表展示 -->
-    <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
-      <el-table-column type="selection"  align="center" width="35" />
-      <el-table-column label="ID" align="center" width="50px">
-        <template #default="scope">
-          {{ scope.row.autoId }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="username" label="用户名" align="center" width="100px" />
-      <el-table-column prop="email" label="邮箱" align="center" width="200px"/>
-      <el-table-column prop="phone" label="手机号" align="center" width="130px"/>
-      <el-table-column prop="status" label="状态" align="center" width="80px" >
-        <template #default="scope">
-          {{ scope.row.status == 1 ? '启用': '禁用' }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center">
-        <template #default="scope">
-          <el-button type="primary" size="small" @click="updateStu(scope.row.id) ;resetForm(stuFormRef)">编辑</el-button>
-          <el-button type="danger" size="small" @click="delById(scope.row.id)">删除</el-button>
-          <el-button v-if="scope.row.status == 1" type="warning" size="small" @click="updateUserStatus(scope.row.id, 0)">禁用</el-button>
-          <el-button v-else type="success" size="small" @click="updateUserStatus(scope.row.id, 1)">启用</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <br>
+    <!-- 表格容器 -->
+    <div class="table-container">
+      <div class="table-header">
+        <h2 class="table-title">用户列表</h2>
+      </div>
+      <el-table :data="tableData" style="width: 100%" stripe @selection-change="handleSelectionChange">
+        <el-table-column type="selection"  align="center" width="50" />
+        <el-table-column label="ID" align="center" width="80">
+          <template #default="scope">
+            <span style="font-weight: 600; color: var(--accent-dark);">{{ scope.row.autoId }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="username" label="用户名" align="center" min-width="120">
+          <template #default="scope">
+            <span class="tag tag-blue">{{ scope.row.username }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="email" label="邮箱" align="center" min-width="200"/>
+        <el-table-column prop="phone" label="手机号" align="center" min-width="130"/>
+        <el-table-column prop="status" label="状态" align="center" width="100">
+          <template #default="scope">
+            <span :class="['status', scope.row.status == 1 ? 'status-published' : 'status-unpublished']">
+              {{ scope.row.status == 1 ? '已启用' : '已禁用' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="240" fixed="right">
+          <template #default="scope">
+            <div class="action-btns">
+              <button class="action-btn" title="编辑" @click="updateStu(scope.row.id) ;resetForm(stuFormRef)">✏</button>
+              <button class="action-btn danger" title="删除" @click="delById(scope.row.id)">🗑</button>
+              <el-tooltip :content="scope.row.status == 1 ? '禁用' : '启用'" placement="top">
+                <button 
+                  class="action-btn" 
+                  :class="scope.row.status == 1 ? 'warning-btn' : 'success-btn'"
+                  @click="updateUserStatus(scope.row.id, scope.row.status == 1 ? 0 : 1)"
+                >
+                  <el-icon v-if="scope.row.status == 1"><Download /></el-icon>
+                  <el-icon v-else><Upload /></el-icon>
+                </button>
+              </el-tooltip>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 分页 -->
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[5, 10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pagination.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
 
-    <!-- 分页组件Pagination -->
-    <el-pagination
-      v-model:current-page="pagination.currentPage"
-      v-model:page-size="pagination.pageSize"
-      :page-sizes="[5, 10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="pagination.total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <!-- 新增/修改用户对话框 -->
+    <el-dialog v-model="dialogFormVisible" :title="formTitle" width="600px" :close-on-click-modal="false" class="case-dialog" destroy-on-close>
+      <el-form :model="stu" ref="stuFormRef" :rules="rules" class="case-form">
+        <div class="form-section">
+          <div class="section-header">
+            <el-icon><User /></el-icon>
+            用户信息
+          </div>
+          <div class="form-row">
+            <div class="form-item-half">
+              <el-form-item label="用户名" prop="username" class="form-item-with-icon">
+                <el-input v-model="stu.username" placeholder="请输入用户名" clearable>
+                  <template #prefix>
+                    <el-icon class="input-icon"><User /></el-icon>
+                  </template>
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="form-item-half">
+              <el-form-item label="邮箱" prop="email" class="form-item-with-icon">
+                <el-input v-model="stu.email" placeholder="请输入邮箱" clearable>
+                  <template #prefix>
+                    <el-icon class="input-icon"><Message /></el-icon>
+                  </template>
+                </el-input>
+              </el-form-item>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-item-half">
+              <el-form-item label="手机号" prop="phone" class="form-item-with-icon">
+                <el-input v-model="stu.phone" placeholder="请输入手机号" clearable>
+                  <template #prefix>
+                    <el-icon class="input-icon"><Phone /></el-icon>
+                  </template>
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="form-item-half">
+              <el-form-item label="状态">
+                <el-select v-model="stu.status" placeholder="请选择" style="width: 100%;">
+                  <el-option label="启用" value="1" />
+                  <el-option label="禁用" value="0" />
+                </el-select>
+              </el-form-item>
+            </div>
+          </div>
+        </div>
+      </el-form>
 
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false; resetForm(stuFormRef)">取消</el-button>
+          <el-button type="primary" @click="save(stuFormRef)">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
+    <!-- 违纪处理 -->
 
-  
-  <!-- 新增/修改用户对话框 -->
-  <el-dialog v-model="dialogFormVisible" :title="formTitle" width="50%">
-    <el-form :model="stu" ref="stuFormRef" :rules="rules">
-      <!-- 第一行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="用户名" :label-width="labelWidth" prop="username">
-            <el-input v-model="stu.username" placeholder="请输入用户名"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="邮箱" :label-width="labelWidth" prop="email">
-            <el-input v-model="stu.email" placeholder="请输入邮箱"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      
-      <!-- 第二行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="手机号" :label-width="labelWidth"  prop="phone">
-            <el-input v-model="stu.phone" placeholder="请输入手机号"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="状态" :label-width="labelWidth">
-            <el-select v-model="stu.status" placeholder="请选择" style="width: 100%;">
-              <el-option label="启用" value="1" />
-              <el-option label="禁用" value="0" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogFormVisible = false; resetForm(stuFormRef)">取消</el-button>
-        <el-button type="primary" @click="save(stuFormRef)">保存</el-button>
-      </span>
-    </template>
-  </el-dialog>
-
-
-  <!-- 违纪处理 -->
-
+  </div>
 </template>
 
 
 <style scoped>
+/* 页面变量 */
+:root {
+  --bg-primary: #F7F5F0;
+  --bg-secondary: #FFFFFF;
+  --accent: #C9A962;
+  --accent-light: #E8D5A3;
+  --accent-dark: #A68B4B;
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #7A7A7A;
+  --border: #E0DCD4;
+  --card-shadow: 0 2px 12px rgba(45, 59, 53, 0.08);
+  --card-shadow-hover: 0 8px 24px rgba(45, 59, 53, 0.12);
+  --sidebar-bg: #1E3A2F;
+}
+
 /* 页面容器 */
 .user-management {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-primary);
   min-height: 100vh;
 }
 
-/* 页面头部样式 */
+/* 页面头部样式 - 悬浮卡片效果 */
 .page-header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3584e4 100%);
+  background: linear-gradient(135deg, #1E3A2F 0%, #2A4A3F 100%) !important;
   border-radius: 16px;
-  padding: 32px 40px;
+  padding: 28px 32px;
   margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(30, 60, 114, 0.25);
+  box-shadow: 
+    0 4px 6px rgba(30, 58, 47, 0.05),
+    0 10px 20px rgba(30, 58, 47, 0.1),
+    0 20px 40px rgba(30, 58, 47, 0.15);
+  border: 1px solid rgba(201, 169, 98, 0.2);
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.page-header:hover {
+  box-shadow: 
+    0 6px 12px rgba(30, 58, 47, 0.08),
+    0 16px 32px rgba(30, 58, 47, 0.15),
+    0 30px 60px rgba(30, 58, 47, 0.2);
+  transform: translateY(-4px);
+  border-color: rgba(201, 169, 98, 0.35);
 }
 
 .page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.page-header::after {
   content: '';
   position: absolute;
   top: -50%;
   right: -10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201, 169, 98, 0.15) 0%, transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.page-header:hover::after {
+  transform: scale(1.1);
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
   position: relative;
   z-index: 1;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
 }
 
 .header-icon {
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #C9A962, #E8D5A3);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #d4af37;
+  color: var(--sidebar-bg);
   flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+}
+
+.header-icon:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(201, 169, 98, 0.4);
 }
 
 .header-icon svg {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }
 
 .header-text {
@@ -403,305 +517,905 @@ const updateUserStatus = async (id, status) => {
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 4px 0;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-}
-
-.header-decoration {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.6;
-}
-
-.decoration-line {
-  width: 80px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #d4af37, transparent);
-}
-
-.decoration-dot {
-  width: 8px;
-  height: 8px;
-  background: #d4af37;
-  border-radius: 50%;
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
-}
-
-/* 搜索表单样式 */
-.demo-form-inline {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 24px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(30, 60, 114, 0.08);
-}
-
-.demo-form-inline :deep(.el-form-item) {
-  margin-bottom: 0;
-  margin-right: 20px;
-}
-
-.demo-form-inline :deep(.el-form-item__label) {
-  color: #1e3c72;
+  font-size: 28px;
   font-weight: 600;
-  font-size: 14px;
-}
-
-.demo-form-inline :deep(.el-input__wrapper) {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #FFFFFF;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 1.2;
   transition: all 0.3s ease;
 }
 
-.demo-form-inline :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+.page-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  line-height: 1.3;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.demo-form-inline :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
+.header-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* 搜索容器样式 - 悬浮卡片效果 */
+.search-container {
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  border: 1px solid rgba(224, 220, 212, 0.8);
+  box-shadow: 
+    0 2px 4px rgba(45, 59, 53, 0.04),
+    0 6px 12px rgba(45, 59, 53, 0.06),
+    0 16px 28px rgba(45, 59, 53, 0.08);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.search-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.search-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 14px 14px 0 0;
+}
+
+.search-container:hover {
+  box-shadow: 
+    0 4px 8px rgba(45, 59, 53, 0.06),
+    0 12px 24px rgba(45, 59, 53, 0.1),
+    0 24px 48px rgba(45, 59, 53, 0.12);
+  border-color: rgba(201, 169, 98, 0.4);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 300px;
+  flex-wrap: wrap;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 80px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1.4;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.search-items {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-item {
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+  position: relative;
+}
+
+.search-item :deep(.el-input__wrapper) {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(45, 59, 53, 0.06);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  background: var(--bg-primary) !important;
+}
+
+.search-item :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 4px 12px rgba(45, 59, 53, 0.1);
+  border-color: var(--accent-light);
+}
+
+.search-item :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.15);
+  border-color: var(--accent);
+}
+
+.search-item :deep(.el-input__inner) {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.search-item :deep(.el-input__inner::placeholder) {
+  color: var(--text-muted);
+}
+
+.search-item :deep(.el-input__prefix-inner .el-icon) {
+  color: var(--accent-dark);
+  font-size: 16px;
+}
+
+.toolbar-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 /* 按钮样式 */
 .el-button {
   border-radius: 8px;
-  font-weight: 500;
-  padding: 10px 20px;
+  font-weight: 600;
+  padding: 10px 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-right: 10px;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  line-height: 1.4;
+  min-width: 80px;
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.el-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+  z-index: -1;
+}
+
+.el-button:hover::before {
+  left: 100%;
 }
 
 .el-button--primary {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, #C9A962, #E8D5A3);
+  color: var(--sidebar-bg);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+  font-weight: 600;
+  text-shadow: none;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
 }
 
 .el-button--primary:hover {
+  background: linear-gradient(135deg, #E8D5A3, #C9A962);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+  box-shadow: 0 6px 16px rgba(201, 169, 98, 0.4);
+  text-shadow: none;
 }
 
 .el-button--success {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  background: linear-gradient(135deg, #C9A962, #E8D5A3);
+  color: var(--sidebar-bg);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+  font-weight: 600;
+  text-shadow: none;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
 }
 
 .el-button--success:hover {
+  background: linear-gradient(135deg, #E8D5A3, #C9A962);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(82, 196, 26, 0.3);
+  box-shadow: 0 6px 16px rgba(201, 169, 98, 0.4);
+  text-shadow: none;
 }
 
 .el-button--warning {
-  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+  background: linear-gradient(135deg, #ED8936, #DD6B20);
+  color: white;
+  box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
 }
 
 .el-button--warning:hover {
+  background: linear-gradient(135deg, #F6AD55, #ED8936);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(250, 173, 20, 0.3);
+  box-shadow: 0 6px 16px rgba(237, 137, 54, 0.4);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .el-button--danger {
-  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  background: linear-gradient(135deg, #E53E3E, #C53030);
+  color: white;
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
 }
 
 .el-button--danger:hover {
+  background: linear-gradient(135deg, #F56565, #E53E3E);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3);
+  box-shadow: 0 6px 16px rgba(229, 62, 62, 0.4);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .el-button--info {
-  background: linear-gradient(135deg, #8c8c8c 0%, #bfbfbf 100%);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(45, 59, 53, 0.06);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  min-width: 80px;
+  text-align: center;
 }
 
 .el-button--info:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(140, 140, 140, 0.3);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  background: rgba(201, 169, 98, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.2);
+}
+
+.el-button:disabled {
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+.el-button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+/* 表格容器 - 悬浮卡片效果 */
+.table-container {
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  border: 1px solid rgba(224, 220, 212, 0.8);
+  box-shadow: 
+    0 2px 4px rgba(45, 59, 53, 0.04),
+    0 6px 12px rgba(45, 59, 53, 0.06),
+    0 16px 28px rgba(45, 59, 53, 0.08);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.table-container:hover {
+  box-shadow: 
+    0 4px 8px rgba(45, 59, 53, 0.06),
+    0 12px 24px rgba(45, 59, 53, 0.1),
+    0 24px 48px rgba(45, 59, 53, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(201, 169, 98, 0.3);
+}
+
+.table-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-primary);
+}
+
+.table-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.5px;
 }
 
 /* 表格样式 */
 .el-table {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(30, 60, 114, 0.08);
+  --el-table-border-color: var(--border);
+  --el-table-header-bg-color: var(--bg-primary);
+  --el-table-header-text-color: var(--text-muted);
+  --el-table-row-hover-bg-color: rgba(201, 169, 98, 0.08);
+}
+
+.el-table {
+  border-radius: 0;
+  border: none;
 }
 
 .el-table :deep(th) {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
-  color: #ffffff;
+  background: var(--bg-primary) !important;
+  color: var(--text-muted);
   font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .el-table :deep(td) {
-  padding: 16px 0;
-  font-size: 14px;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
 }
 
 .el-table :deep(.el-table__row) {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .el-table :deep(.el-table__row:hover) {
-  background-color: rgba(30, 60, 114, 0.05);
-  transform: scale(1.01);
+  background-color: rgba(201, 169, 98, 0.08);
+  transform: translateY(-1px);
 }
 
-.el-table :deep(.el-table__row:hover td) {
-  background-color: transparent;
+.el-table :deep(.el-table__row:last-child td) {
+  border-bottom: none;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tag-blue {
+  background: rgba(66, 153, 225, 0.12);
+  color: #2B6CB0;
+}
+
+.tag-gold {
+  background: rgba(201, 169, 98, 0.15);
+  color: var(--accent-dark);
+}
+
+.tag-green {
+  background: rgba(72, 187, 120, 0.12);
+  color: #2F855A;
+}
+
+.tag-red {
+  background: rgba(229, 62, 62, 0.12);
+  color: #C53030;
 }
 
 /* 操作按钮样式 */
+.action-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 98, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  background: rgba(201, 169, 98, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.2);
+}
+
+.action-btn.danger:hover {
+  border-color: #E53E3E;
+  color: #E53E3E;
+  background: rgba(229, 62, 62, 0.08);
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
+}
+
+.action-btn.success-btn:hover {
+  border-color: #48BB78;
+  color: #48BB78;
+  background: rgba(72, 187, 120, 0.08);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
+}
+
+.action-btn.warning-btn {
+  color: #ED8936;
+}
+
+.action-btn.warning-btn:hover {
+  border-color: #ED8936;
+  color: #ED8936;
+  background: rgba(237, 137, 54, 0.08);
+  box-shadow: 0 4px 12px rgba(237, 137, 54, 0.2);
+}
+
+/* 状态样式 */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.status:hover {
+  transform: translateY(-1px);
+}
+
+.status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(72, 187, 120, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+  }
+}
+
+.status-published {
+  color: #48BB78;
+}
+
+.status-published::before {
+  background: #48BB78;
+}
+
+.status-unpublished {
+  color: #E53E3E;
+}
+
+.status-unpublished::before {
+  background: #E53E3E;
+  animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(229, 62, 62, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+  }
+}
+
+/* 表格内的按钮样式 */
 .el-table .el-button {
-  margin: 0 4px;
-  padding: 6px 14px;
-  font-size: 13px;
+  margin: 0 2px;
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 /* 分页样式 */
-.el-pagination {
-  margin-top: 24px;
+.pagination-container {
   padding: 20px 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(30, 60, 114, 0.08);
   display: flex;
   justify-content: flex-end;
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.el-pagination {
+  --el-pagination-bg-color: transparent;
+  --el-pagination-button-bg-color: var(--bg-secondary);
+  --el-pagination-hover-color: var(--accent);
 }
 
 .el-pagination :deep(.el-pager li) {
-  border-radius: 6px;
+  border-radius: 8px;
   margin: 0 4px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.el-pagination :deep(.el-pager li:hover) {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
 .el-pagination :deep(.el-pager li.is-active) {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+  background: linear-gradient(135deg, #C9A962, #A68B4B) !important;
+  border-color: #C9A962 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3) !important;
+  transform: translateY(-1px);
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  padding: 0 10px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  line-height: 30px !important;
+  text-align: center !important;
+  z-index: 1 !important;
 }
 
 .el-pagination :deep(.btn-prev),
 .el-pagination :deep(.btn-next) {
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .el-pagination :deep(.btn-prev:hover),
 .el-pagination :deep(.btn-next:hover) {
-  background-color: rgba(30, 60, 114, 0.1);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.2);
 }
 
 /* 对话框样式 */
 :deep(.el-dialog) {
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 24px 48px rgba(45, 59, 53, 0.2);
+  max-width: 640px;
+  animation: dialogFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: center top;
+}
+
+@keyframes dialogFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(-30px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+:deep(.el-overlay) {
+  animation: overlayFadeIn 0.25s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  padding: 24px 32px;
+  background: linear-gradient(135deg, var(--sidebar-bg), #2A4A3F);
+  padding: 20px 24px;
   margin: 0;
   border-bottom: none;
+  position: relative;
+  overflow: hidden;
+}
+
+:deep(.el-dialog__header::before) {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+:deep(.el-dialog__header::after) {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(201, 169, 98, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.5s ease;
 }
 
 :deep(.el-dialog__title) {
   font-weight: 600;
   color: #ffffff;
   font-size: 18px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
   letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+:deep(.el-dialog__headerbtn) {
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.el-dialog__headerbtn:hover) {
+  background: rgba(201, 169, 98, 0.2);
+  transform: scale(1.05);
 }
 
 :deep(.el-dialog__headerbtn .el-dialog__close) {
-  color: #ffffff;
-  font-size: 20px;
-  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 :deep(.el-dialog__headerbtn .el-dialog__close:hover) {
-  color: #d4af37;
-  transform: rotate(90deg);
+  color: #C9A962;
+  transform: rotate(90deg) scale(1.15);
 }
 
 :deep(.el-dialog__body) {
-  padding: 32px;
-  background-color: #fafafa;
+  padding: 28px;
+  background-color: var(--bg-primary);
+  animation: bodyFadeIn 0.4s ease 0.1s forwards;
+  opacity: 0;
+}
+
+@keyframes bodyFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 :deep(.el-dialog__footer) {
-  padding: 20px 32px;
-  border-top: 1px solid rgba(30, 60, 114, 0.1);
-  background-color: #ffffff;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  animation: footerSlideIn 0.4s ease 0.2s forwards;
+  opacity: 0;
 }
 
-/* 表单样式 */
-:deep(.el-form-item__label) {
+@keyframes footerSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 表单美化样式 */
+.case-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(224, 220, 212, 0.6);
+  position: relative;
+  transition: all 0.3s ease;
+  animation: sectionFadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+.form-section:nth-child(1) { animation-delay: 0.15s; }
+
+@keyframes sectionFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-section:hover {
+  border-color: rgba(201, 169, 98, 0.4);
+  box-shadow: 0 4px 16px rgba(45, 59, 53, 0.08);
+}
+
+.form-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 12px 12px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.form-section:hover::before {
+  opacity: 1;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
-  color: #1e3c72;
   font-size: 14px;
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-:deep(.el-input__wrapper),
-:deep(.el-textarea__inner) {
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+.section-header .el-icon {
+  font-size: 18px;
+  color: var(--accent-dark);
+  background: rgba(201, 169, 98, 0.15);
+  padding: 6px;
+  border-radius: 6px;
 }
 
-:deep(.el-input__wrapper:hover),
-:deep(.el-textarea__inner:hover) {
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+.form-row {
+  display: flex;
+  gap: 16px;
 }
 
-:deep(.el-input__wrapper.is-focus),
-:deep(.el-textarea__inner:focus) {
-  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
-  border-color: #1e3c72;
+.form-item-half {
+  flex: 1;
 }
 
-:deep(.el-select .el-input__wrapper) {
-  cursor: pointer;
+.form-item-with-icon :deep(.el-input__wrapper) {
+  padding-left: 12px;
 }
 
-/* 状态标签样式 */
-.status-tag {
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
+.input-icon {
+  color: var(--accent-dark);
+  font-size: 16px;
 }
 
-.status-enabled {
-  background: linear-gradient(135deg, #e6f7e6 0%, #f0f9f0 100%);
-  color: #52c41a;
-  border: 1px solid rgba(82, 196, 26, 0.2);
-}
-
-.status-disabled {
-  background: linear-gradient(135deg, #fff1f0 0%, #fff7f6 100%);
-  color: #ff4d4f;
-  border: 1px solid rgba(255, 77, 79, 0.2);
+.form-tip {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* 响应式设计 */
@@ -711,17 +1425,32 @@ const updateUserStatus = async (id, status) => {
   }
   
   .page-title {
-    font-size: 28px;
+    font-size: 24px;
   }
   
   .header-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
   
   .header-icon svg {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toolbar-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .search-items {
+    width: 100%;
+  }
+  
+  .search-item {
+    min-width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -733,23 +1462,42 @@ const updateUserStatus = async (id, status) => {
   .header-content {
     flex-direction: column;
     text-align: center;
+    gap: 12px;
   }
   
-  .header-decoration {
-    display: none;
+  .header-left {
+    flex-direction: column;
+    text-align: center;
   }
   
   .page-title {
-    font-size: 24px;
+    font-size: 20px;
   }
   
-  .demo-form-inline {
+  .search-container {
     padding: 16px;
   }
   
-  .demo-form-inline :deep(.el-form-item) {
-    margin-right: 0;
-    margin-bottom: 16px;
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .toolbar-right {
+    justify-content: center;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  :deep(.el-dialog) {
+    margin: 20px;
+    width: auto !important;
+  }
+  
+  :deep(.el-dialog__body) {
+    padding: 20px;
   }
 }
 </style>

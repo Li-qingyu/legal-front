@@ -1,54 +1,62 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { getCaseCountApi, getTypeCountApi, getArticleCountApi, getUserCountApi, getTrendDataApi, getRecentActivitiesApi } from "@/api/work-space";
+import { Document, Collection, Reading, User, ArrowRight, TrendCharts, Clock } from '@element-plus/icons-vue';
 
 const stats = ref([
   { 
     title: '法律案例', 
     count: 0, 
-    icon: '📚', 
-    color: '#1e3c72',
-    gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+    icon: Document,
+    color: '#48BB78',
+    bgColor: 'rgba(72, 187, 120, 0.12)',
     trend: '+12.5%',
     trendUp: true
   },
   { 
     title: '法律类型', 
     count: 0, 
-    icon: '⚖️', 
-    color: '#d4af37',
-    gradient: 'linear-gradient(135deg, #d4af37 0%, #f0c419 100%)',
+    icon: Collection,
+    color: '#4299E1',
+    bgColor: 'rgba(66, 153, 225, 0.12)',
     trend: '+5.2%',
     trendUp: true
   },
   { 
     title: '法律条文', 
     count: 0, 
-    icon: '📜', 
-    color: '#52c41a',
-    gradient: 'linear-gradient(135deg, #52c41a 0%, #73d13d 100%)',
+    icon: Reading,
+    color: '#C9A962',
+    bgColor: 'rgba(201, 169, 98, 0.15)',
     trend: '+8.3%',
     trendUp: true
   },
   { 
     title: '用户总数', 
     count: 0, 
-    icon: '👥', 
-    color: '#ff4d4f',
-    gradient: 'linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%)',
+    icon: User,
+    color: '#E53E3E',
+    bgColor: 'rgba(229, 62, 62, 0.12)',
     trend: '+15.8%',
     trendUp: true
   }
 ]);
 
 const quickActions = ref([
-  { title: '新增案例', icon: '➕', path: '/admin/case', color: '#1e3c72' },
-  { title: '管理类型', icon: '⚖️', path: '/admin/type', color: '#d4af37' },
-  { title: '法律条文', icon: '📜', path: '/admin/law-article', color: '#52c41a' },
-  { title: '用户管理', icon: '👥', path: '/admin/user', color: '#ff4d4f' }
+  { title: '新增案例', icon: '📚', path: '/admin/case', color: '#48BB78', desc: '添加法律案例' },
+  { title: '管理类型', icon: '⚖️', path: '/admin/type', color: '#4299E1', desc: '维护法律分类' },
+  { title: '法律条文', icon: '📜', path: '/admin/law-article', color: '#C9A962', desc: '编辑法规内容' },
+  { title: '用户管理', icon: '👥', path: '/admin/user', color: '#E53E3E', desc: '管理平台用户' }
 ]);
 
 const recentActivities = ref([]);
+
+// 当前日期
+const currentDate = computed(() => {
+  const date = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+  return date.toLocaleDateString('zh-CN', options);
+});
 
 onMounted(() => {
   loadStats();
@@ -57,7 +65,6 @@ onMounted(() => {
 
 const loadStats = async () => {
   try {
-    // 获取数量统计数据
     const caseResponse = await getCaseCountApi();
     stats.value[0].count = caseResponse.data || 0;
 
@@ -70,33 +77,25 @@ const loadStats = async () => {
     const userResponse = await getUserCountApi();
     stats.value[3].count = userResponse.data || 0;
 
-    // 获取增长趋势数据
     const trendResponse = await getTrendDataApi();
     const trendData = trendResponse.data;
     
     if (trendData) {
-      // 更新案例增长趋势
       if (trendData.cases) {
         const caseTrend = parseFloat(trendData.cases.trend).toFixed(2);
         stats.value[0].trend = `${parseFloat(caseTrend) > 0 ? '+' : ''}${caseTrend}%`;
         stats.value[0].trendUp = parseFloat(trendData.cases.trend) > 0;
       }
-      
-      // 更新类型增长趋势
       if (trendData.types) {
         const typeTrend = parseFloat(trendData.types.trend).toFixed(2);
         stats.value[1].trend = `${parseFloat(typeTrend) > 0 ? '+' : ''}${typeTrend}%`;
         stats.value[1].trendUp = parseFloat(trendData.types.trend) > 0;
       }
-      
-      // 更新条文增长趋势
       if (trendData.articles) {
         const articleTrend = parseFloat(trendData.articles.trend).toFixed(2);
         stats.value[2].trend = `${parseFloat(articleTrend) > 0 ? '+' : ''}${articleTrend}%`;
         stats.value[2].trendUp = parseFloat(trendData.articles.trend) > 0;
       }
-      
-      // 更新用户增长趋势
       if (trendData.users) {
         const userTrend = parseFloat(trendData.users.trend).toFixed(2);
         stats.value[3].trend = `${parseFloat(userTrend) > 0 ? '+' : ''}${userTrend}%`;
@@ -117,27 +116,21 @@ const loadRecentActivities = async () => {
   }
 };
 
-// 根据活动类型获取对应的图标
 const getActivityIcon = (type) => {
   const iconMap = {
-    // 案例相关
     'case_add': '📚',
-    'case_update': '�',
+    'case_update': '📝',
     'case_delete': '🗑️',
-    // 法律条文相关
     'law_add': '📜',
     'law_update': '📝',
     'law_delete': '🗑️',
-    // 用户相关
-    'user_add': '�',
+    'user_add': '👤',
     'user_update': '👤',
-    'user_delete': '�️',
+    'user_delete': '🗑️',
     'user_register': '👥',
-    // 法律类型相关
     'type_add': '⚖️',
     'type_update': '📝',
     'type_delete': '🗑️',
-    // 法律书籍相关
     'book_add': '📖',
     'book_update': '📝',
     'book_delete': '🗑️'
@@ -145,7 +138,13 @@ const getActivityIcon = (type) => {
   return iconMap[type] || '📋';
 };
 
-// 格式化时间
+const getActivityDotColor = (type) => {
+  if (type.includes('add') || type.includes('register')) return 'green';
+  if (type.includes('update')) return 'gold';
+  if (type.includes('delete')) return 'red';
+  return 'blue';
+};
+
 const formatTime = (timeString) => {
   const date = new Date(timeString);
   const now = new Date();
@@ -154,31 +153,27 @@ const formatTime = (timeString) => {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
   
-  if (minutes < 60) {
-    return `${minutes}分钟前`;
-  } else if (hours < 24) {
-    return `${hours}小时前`;
-  } else if (days < 7) {
-    return `${days}天前`;
-  } else {
-    return date.toLocaleDateString('zh-CN');
-  }
+  if (minutes < 60) return `${minutes}分钟前`;
+  if (hours < 24) return `${hours}小时前`;
+  if (days < 7) return `${days}天前`;
+  return date.toLocaleDateString('zh-CN');
 };
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <!-- 欢迎横幅 -->
-    <div class="welcome-banner">
-      <div class="banner-content">
-        <h1 class="welcome-title">欢迎回来，管理员</h1>
-        <p class="welcome-subtitle">Welcome back, Administrator</p>
-        <p class="welcome-desc">今天是 {{ new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }) }}</p>
-      </div>
-      <div class="banner-decoration">
-        <div class="decoration-circle circle-1"></div>
-        <div class="decoration-circle circle-2"></div>
-        <div class="decoration-circle circle-3"></div>
+  <div class="workspace-container">
+    <!-- 页面标题区 -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <span class="title-text">工作台</span>
+          <span class="title-wave">👋</span>
+        </h1>
+        <p class="page-desc">
+          <span class="greeting">欢迎回来，管理员</span>
+          <span class="date-separator">·</span>
+          <span class="date">{{ currentDate }}</span>
+        </p>
       </div>
     </div>
 
@@ -188,59 +183,83 @@ const formatTime = (timeString) => {
         v-for="(stat, index) in stats" 
         :key="index" 
         class="stat-card"
-        :style="{ '--card-gradient': stat.gradient }"
+        :style="{ animationDelay: `${index * 0.12}s` }"
       >
-        <div class="stat-icon">{{ stat.icon }}</div>
-        <div class="stat-content">
-          <div class="stat-title">{{ stat.title }}</div>
-          <div class="stat-count">{{ stat.count }}</div>
-          <div class="stat-trend" :class="{ 'trend-up': stat.trendUp }">
-            {{ stat.trend }}
+        <div class="stat-shine"></div>
+        <div class="stat-icon" :style="{ background: stat.bgColor, color: stat.color }">
+          <el-icon class="icon-bounce"><component :is="stat.icon" /></el-icon>
+        </div>
+        <div class="stat-value">
+          <span class="count-number" :data-target="stat.count">{{ stat.count }}</span>
+        </div>
+        <div class="stat-label">{{ stat.title }}</div>
+        <div class="stat-trend" :class="{ up: stat.trendUp, down: !stat.trendUp }">
+          <el-icon class="trend-icon" v-if="stat.trendUp"><TrendCharts /></el-icon>
+          <el-icon class="trend-icon" v-else><TrendCharts style="transform: rotate(180deg)" /></el-icon>
+          <span>{{ stat.trend }} 较上月</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 两栏布局：快捷操作 + 最近活动 -->
+    <div class="dashboard-grid" style="animation-delay: 0.5s;">
+      <!-- 快捷操作 -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">快捷操作</h3>
+        </div>
+        <div class="card-body">
+          <div class="quick-actions-list">
+            <router-link 
+              v-for="(action, index) in quickActions" 
+              :key="index" 
+              :to="action.path" 
+              class="quick-action-item"
+              :style="{ '--action-color': action.color, animationDelay: `${0.6 + index * 0.08}s` }"
+            >
+              <div class="action-icon-wrap" :style="{ background: action.color + '15', color: action.color }">
+                <span class="action-emoji">{{ action.icon }}</span>
+              </div>
+              <div class="action-info">
+                <div class="action-title">{{ action.title }}</div>
+                <div class="action-desc">{{ action.desc }}</div>
+              </div>
+              <el-icon class="action-arrow"><ArrowRight /></el-icon>
+            </router-link>
           </div>
         </div>
-        <div class="stat-decoration"></div>
       </div>
-    </div>
 
-    <!-- 快捷操作 -->
-    <div class="quick-actions-section">
-      <h2 class="section-title">快捷操作</h2>
-      <div class="quick-actions-grid">
-        <router-link 
-          v-for="(action, index) in quickActions" 
-          :key="index" 
-          :to="action.path" 
-          class="quick-action-card"
-          :style="{ '--action-color': action.color }"
-        >
-          <div class="action-icon">{{ action.icon }}</div>
-          <div class="action-title">{{ action.title }}</div>
-          <div class="action-arrow">→</div>
-        </router-link>
-      </div>
-    </div>
-
-    <!-- 最近活动 -->
-    <div class="recent-activities-section">
-      <h2 class="section-title">最近活动</h2>
-      <div class="activities-list">
-        <div 
-          v-for="(activity, index) in recentActivities" 
-          :key="activity.id || index" 
-          class="activity-item"
-        >
-          <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
-          <div class="activity-content">
-            <div class="activity-title">{{ activity.title }}</div>
-            <div class="activity-meta">
-              <span class="activity-user">{{ activity.userName }}</span>
-              <span class="activity-time">{{ formatTime(activity.time) }}</span>
+      <!-- 最近活动 -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">最近活动</h3>
+        </div>
+        <div class="card-body">
+          <div class="timeline" v-if="recentActivities.length > 0">
+            <div 
+              v-for="(activity, index) in recentActivities.slice(0, 6)" 
+              :key="activity.id || index" 
+              class="timeline-item"
+              :style="{ animationDelay: `${0.8 + index * 0.1}s` }"
+            >
+              <div class="timeline-dot pulse" :class="getActivityDotColor(activity.type)"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">{{ activity.title }}</div>
+                <div class="timeline-meta">
+                  <span class="timeline-user">{{ activity.userName }}</span>
+                  <span class="timeline-time">
+                    <el-icon><Clock /></el-icon>
+                    {{ formatTime(activity.time) }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="activity-indicator"></div>
-        </div>
-        <div v-if="recentActivities.length === 0" class="no-activities">
-          <p>暂无最近活动</p>
+          <div v-else class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">暂无最近活动</div>
+          </div>
         </div>
       </div>
     </div>
@@ -248,148 +267,88 @@ const formatTime = (timeString) => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
-
-.dashboard-container {
-  padding: 0;
+/* 工作区容器 */
+.workspace-container {
   max-width: 1400px;
   margin: 0 auto;
-  font-family: 'Lato', sans-serif;
 }
 
-/* 欢迎横幅 */
-.welcome-banner {
-  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
-  border-radius: 16px;
-  padding: 56px 64px;
-  margin-bottom: 40px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 16px 48px rgba(30, 58, 138, 0.3);
+/* 页面标题 */
+.page-header {
+  margin-bottom: 28px;
+  animation: slideDown 0.6s ease forwards;
 }
 
-.welcome-banner::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(180, 83, 9, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
+.page-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #2D3B35;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.welcome-banner::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-  z-index: 1;
+.title-text {
+  animation: fadeInLeft 0.5s ease forwards;
 }
 
-.banner-content {
-  position: relative;
-  z-index: 2;
+.title-wave {
+  display: inline-block;
+  animation: wave 2s ease-in-out infinite;
+  transform-origin: 70% 70%;
 }
 
-.welcome-title {
-  font-size: 42px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  font-family: 'EB Garamond', serif;
+.page-desc {
+  font-size: 14px;
+  color: #6B7B75;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.6s ease 0.2s forwards;
+  opacity: 0;
 }
 
-.welcome-subtitle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 20px 0;
-  font-weight: 400;
-  letter-spacing: 0.5px;
+.greeting {
+  animation: fadeIn 0.5s ease 0.3s forwards;
+  opacity: 0;
 }
 
-.welcome-desc {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-  font-weight: 300;
+.date-separator {
+  color: #C9A962;
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.banner-decoration {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.decoration-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  animation: float 6s ease-in-out infinite;
-}
-
-.circle-1 {
-  width: 140px;
-  height: 140px;
-  top: 20%;
-  right: 15%;
-  animation-delay: 0s;
-}
-
-.circle-2 {
-  width: 100px;
-  height: 100px;
-  top: 60%;
-  right: 25%;
-  animation-delay: 2s;
-}
-
-.circle-3 {
-  width: 80px;
-  height: 80px;
-  top: 40%;
-  right: 35%;
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateY(-25px) scale(1.1);
-    opacity: 0.5;
-  }
+.date {
+  animation: fadeIn 0.5s ease 0.4s forwards;
+  opacity: 0;
 }
 
 /* 统计卡片网格 */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
 }
 
 .stat-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 32px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 24px;
+  border: 1px solid #E5E0D8;
+  box-shadow: 0 2px 12px rgba(45, 59, 53, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid #E2E8F0;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.stat-card:hover {
+  box-shadow: 0 12px 32px rgba(45, 59, 53, 0.15);
+  transform: translateY(-6px) scale(1.02);
 }
 
 .stat-card::before {
@@ -398,475 +357,580 @@ const formatTime = (timeString) => {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: var(--card-gradient);
+  height: 3px;
+  background: linear-gradient(90deg, #C9A962, #E8D5A3);
 }
 
-.stat-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-  border-color: #CBD5E1;
+.stat-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.7s;
+}
+
+.stat-card:hover .stat-shine {
+  left: 100%;
 }
 
 .stat-icon {
-  font-size: 56px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.1));
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
 }
 
-.stat-content {
-  position: relative;
-  z-index: 1;
+.stat-card:hover .stat-icon {
+  transform: scale(1.1) rotate(-5deg);
 }
 
-.stat-title {
-  font-size: 16px;
-  color: #64748B;
-  margin-bottom: 12px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+.icon-bounce {
+  animation: iconFloat 3s ease-in-out infinite;
 }
 
-.stat-count {
-  font-size: 42px;
+.stat-card:hover .icon-bounce {
+  animation: iconBounce 0.5s ease;
+}
+
+.stat-value {
+  font-size: 32px;
   font-weight: 700;
-  color: #1E3A8A;
+  color: #2D3B35;
+  margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+.count-number {
+  display: inline-block;
+  animation: countIn 0.8s ease forwards;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6B7B75;
   margin-bottom: 12px;
-  line-height: 1;
-  font-family: 'EB Garamond', serif;
+  transition: color 0.3s ease;
+}
+
+.stat-card:hover .stat-label {
+  color: #2D3B35;
 }
 
 .stat-trend {
-  font-size: 14px;
-  font-weight: 600;
-  color: #10B981;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: rgba(16, 185, 129, 0.1);
-  border-radius: 20px;
-}
-
-.stat-trend::before {
-  content: '↑';
+  gap: 4px;
   font-size: 12px;
+  font-weight: 500;
 }
 
-.stat-trend:not(.trend-up) {
-  color: #EF4444;
-  background: rgba(239, 68, 68, 0.1);
+.trend-icon {
+  animation: trendPulse 2s ease-in-out infinite;
 }
 
-.stat-trend:not(.trend-up)::before {
-  content: '↓';
+.stat-trend.up {
+  color: #48BB78;
 }
 
-.stat-decoration {
-  position: absolute;
-  bottom: -20px;
-  right: -20px;
-  width: 120px;
-  height: 120px;
-  background: var(--card-gradient);
-  border-radius: 50%;
-  opacity: 0.05;
+.stat-trend.down {
+  color: #E53E3E;
+}
+
+.stat-trend .el-icon {
+  font-size: 14px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.stat-icon .el-icon {
+  font-size: 24px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2D3B35;
+  margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6B7B75;
+  margin-bottom: 12px;
+}
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.stat-trend.up {
+  color: #48BB78;
+}
+
+.stat-trend.down {
+  color: #E53E3E;
+}
+
+.stat-trend .el-icon {
+  font-size: 14px;
+}
+
+/* 两栏布局 */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+/* 卡片样式 */
+.card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid #E5E0D8;
+  box-shadow: 0 2px 12px rgba(45, 59, 53, 0.08);
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.stat-card:hover .stat-decoration {
-  opacity: 0.1;
-  transform: scale(1.3);
+.card:hover {
+  box-shadow: 0 8px 24px rgba(45, 59, 53, 0.12);
 }
 
-/* 快捷操作区域 */
-.quick-actions-section {
-  margin-bottom: 40px;
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #E5E0D8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.section-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1E3A8A;
-  margin-bottom: 24px;
+.card-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2D3B35;
+  position: relative;
+}
+
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #C9A962, #E8D5A3);
+  transition: width 0.4s ease;
+}
+
+.card:hover .card-title::after {
+  width: 100%;
+}
+
+.card-body {
+  padding: 20px 24px;
+}
+
+/* 卡片样式 */
+.card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid #E5E0D8;
+  box-shadow: 0 2px 12px rgba(45, 59, 53, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #E5E0D8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2D3B35;
+}
+
+.card-body {
+  padding: 20px 24px;
+}
+
+/* 快捷操作列表 */
+.quick-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quick-action-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  font-family: 'EB Garamond', serif;
-}
-
-.section-title::before {
-  content: '';
-  width: 4px;
-  height: 32px;
-  background: #B45309;
-  border-radius: 2px;
-}
-
-.quick-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
-}
-
-.quick-action-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 40px 28px;
+  padding: 16px;
+  background: #F7F5F0;
+  border-radius: 10px;
   text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.quick-action-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--action-color);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.quick-action-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-  border-color: var(--action-color);
-}
-
-.quick-action-card:hover::before {
-  transform: scaleX(1);
-}
-
-.action-icon {
-  font-size: 48px;
-  transition: transform 0.3s ease;
-}
-
-.quick-action-card:hover .action-icon {
-  transform: scale(1.3) rotate(5deg);
-}
-
-.action-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1E3A8A;
-  text-align: center;
-  font-family: 'EB Garamond', serif;
-}
-
-.action-arrow {
-  font-size: 28px;
-  color: var(--action-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  animation: slideInRight 0.5s ease forwards;
   opacity: 0;
-  transform: translateX(-15px);
-  transition: all 0.3s ease;
+  transform: translateX(-20px);
 }
 
-.quick-action-card:hover .action-arrow {
-  opacity: 1;
-  transform: translateX(0) scale(1.2);
+.quick-action-item:hover {
+  background: #FFFFFF;
+  border-color: var(--action-color);
+  box-shadow: 0 8px 24px rgba(45, 59, 53, 0.12);
+  transform: translateX(8px) scale(1.02);
 }
 
-/* 最近活动区域 */
-.recent-activities-section {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 40px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid #E2E8F0;
-}
-
-.activities-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 24px;
-  background: #F8FAFC;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  border: 1px solid #E2E8F0;
-  position: relative;
-  overflow: hidden;
-}
-
-.activity-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: #B45309;
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
-}
-
-.activity-item:hover {
-  transform: translateX(12px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-  border-color: #CBD5E1;
-  background: #ffffff;
-}
-
-.activity-item:hover::before {
-  transform: scaleY(1);
-}
-
-.activity-icon {
-  font-size: 36px;
-  flex-shrink: 0;
-  width: 60px;
-  height: 60px;
+.action-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F1F5F9;
-  border-radius: 12px;
+  flex-shrink: 0;
   transition: all 0.3s ease;
 }
 
-.activity-item:hover .activity-icon {
-  background: #E2E8F0;
-  transform: scale(1.1);
+.quick-action-item:hover .action-icon-wrap {
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.activity-content {
+.action-emoji {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.quick-action-item:hover .action-emoji {
+  animation: wiggle 0.5s ease;
+}
+
+.action-info {
   flex: 1;
 }
 
-.activity-title {
-  font-size: 16px;
+.action-title {
+  font-size: 14px;
   font-weight: 600;
-  color: #1E3A8A;
-  margin-bottom: 8px;
+  color: #2D3B35;
+  margin-bottom: 2px;
+  transition: color 0.3s ease;
+}
+
+.quick-action-item:hover .action-title {
+  color: var(--action-color);
+}
+
+.action-desc {
+  font-size: 12px;
+  color: #9CA8A3;
+  transition: color 0.3s ease;
+}
+
+.quick-action-item:hover .action-desc {
+  color: #6B7B75;
+}
+
+.action-arrow {
+  font-size: 16px;
+  color: #9CA8A3;
+  transition: all 0.3s ease;
+}
+
+.quick-action-item:hover .action-arrow {
+  color: var(--action-color);
+  transform: translateX(8px);
+  animation: arrowBounce 0.8s ease infinite;
+}
+
+/* 时间轴 */
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, #E5E0D8 0%, #C9A962 50%, #E5E0D8 100%);
+  background-size: 100% 200%;
+  animation: gradientFlow 3s ease infinite;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 20px;
+  animation: fadeInLeft 0.5s ease forwards;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item:hover .timeline-content {
+  transform: translateX(8px);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 0 1px #E5E0D8;
+  transition: all 0.3s ease;
+}
+
+.timeline-item:hover .timeline-dot {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.timeline-dot.pulse {
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+.timeline-dot.green { background: #48BB78; }
+.timeline-dot.gold { background: #C9A962; }
+.timeline-dot.blue { background: #4299E1; }
+.timeline-dot.red { background: #E53E3E; }
+
+.timeline-content {
+  padding-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D3B35;
+  margin-bottom: 4px;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.timeline-item:hover .timeline-title {
+  color: #1E3A2F;
+}
+
+.timeline-content {
+  padding-left: 8px;
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D3B35;
+  margin-bottom: 4px;
   line-height: 1.4;
 }
 
-.activity-meta {
+.timeline-meta {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 8px;
+  gap: 12px;
+  font-size: 12px;
+  color: #9CA8A3;
 }
 
-.activity-user {
-  font-size: 14px;
-  color: #64748B;
-  font-weight: 500;
-  background: #E2E8F0;
-  padding: 4px 12px;
-  border-radius: 16px;
-}
-
-.activity-time {
-  font-size: 14px;
-  color: #94A3B8;
+.timeline-user {
+  background: #F7F5F0;
+  padding: 2px 8px;
+  border-radius: 4px;
   font-weight: 500;
 }
 
-.activity-indicator {
-  width: 10px;
-  height: 10px;
-  background: #B45309;
-  border-radius: 50%;
-  box-shadow: 0 0 16px rgba(180, 83, 9, 0.6);
-  flex-shrink: 0;
-  animation: pulse 2s infinite;
+.timeline-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeline-time .el-icon {
+  font-size: 12px;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9CA8A3;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+.empty-text {
+  font-size: 14px;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  50% { transform: scale(0.9) rotate(5deg); }
+  75% { transform: scale(1.1) rotate(-5deg); }
+}
+
+@keyframes countIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.8); 
   }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
   }
 }
 
-.no-activities {
-  text-align: center;
-  padding: 60px 20px;
-  color: #94A3B8;
-  font-size: 16px;
-  background: #F8FAFC;
-  border-radius: 12px;
-  margin-top: 20px;
-  border: 2px dashed #E2E8F0;
+@keyframes trendPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
-.no-activities::before {
-  content: '📋';
-  font-size: 48px;
-  display: block;
-  margin-bottom: 16px;
-  opacity: 0.5;
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-5deg); }
 }
 
-/* 响应式设计 */
+@keyframes arrowBounce {
+  0%, 100% { transform: translateX(8px); }
+  50% { transform: translateX(12px); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(201, 169, 98, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 6px rgba(201, 169, 98, 0);
+  }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* 响应式 */
 @media (max-width: 1200px) {
-  .welcome-banner {
-    padding: 48px 48px;
-  }
-  
-  .welcome-title {
-    font-size: 36px;
-  }
-  
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .stat-card {
-    padding: 28px;
-  }
-  
-  .stat-count {
-    font-size: 36px;
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .dashboard-container {
-    padding: 0 20px;
-  }
-  
-  .welcome-banner {
-    padding: 36px 32px;
-    margin-bottom: 32px;
-  }
-  
-  .welcome-title {
-    font-size: 32px;
-  }
-  
-  .welcome-subtitle {
-    font-size: 16px;
-  }
-  
-  .welcome-desc {
-    font-size: 14px;
-  }
-  
   .stats-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin-bottom: 32px;
   }
   
-  .stat-card {
-    padding: 24px;
-  }
-  
-  .stat-count {
-    font-size: 32px;
-  }
-  
-  .quick-actions-section {
-    margin-bottom: 32px;
-  }
-  
-  .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  
-  .quick-action-card {
-    padding: 32px 20px;
-  }
-  
-  .action-icon {
-    font-size: 40px;
-  }
-  
-  .action-title {
-    font-size: 16px;
-  }
-  
-  .recent-activities-section {
-    padding: 32px;
-  }
-  
-  .activity-item {
-    padding: 20px;
-    gap: 16px;
-  }
-  
-  .activity-icon {
-    font-size: 32px;
-    width: 50px;
-    height: 50px;
-  }
-  
-  .section-title {
+  .page-title {
     font-size: 24px;
   }
   
-  .activity-title {
-    font-size: 15px;
-  }
-  
-  .activity-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .welcome-banner {
-    padding: 28px 24px;
-  }
-  
-  .welcome-title {
-    font-size: 28px;
-  }
-  
-  .quick-actions-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .activity-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .activity-indicator {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-  
-  .recent-activities-section {
-    padding: 24px;
-  }
-  
-  .no-activities {
-    padding: 40px 16px;
+  .card-body {
+    padding: 16px;
   }
 }
 </style>

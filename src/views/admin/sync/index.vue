@@ -202,34 +202,36 @@ const syncLawCases = async () => {
     <!-- 顶部标题 -->
     <div class="page-header">
       <div class="header-content">
-        <div class="header-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 3H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 11H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 17H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 9V21C2 21.5304 2.21071 22.0391 2.58579 22.4142C2.96086 22.7893 3.46957 23 4 23H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div class="header-left">
+          <div class="header-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 3H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 17H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 9V21C2 21.5304 2.21071 22.0391 2.58579 22.4142C2.96086 22.7893 3.46957 23 4 23H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="header-text">
+            <h1 class="page-title">同步知识库</h1>
+            <p class="page-subtitle">Knowledge Base Synchronization</p>
+          </div>
         </div>
-        <div class="header-text">
-          <h1 class="page-title">同步知识库</h1>
-          <p class="page-subtitle">Knowledge Base Synchronization</p>
-        </div>
-        <div class="header-decoration">
-          <div class="decoration-line"></div>
-          <div class="decoration-dot"></div>
+        <div class="header-right">
+          <div class="header-decoration">
+            <div class="decoration-line"></div>
+            <div class="decoration-dot"></div>
+          </div>
         </div>
       </div>
     </div>
     
     <div class="sync-cards">
       <!-- 同步法律条文卡片 -->
-      <el-card class="sync-card">
-        <template #header>
-          <div class="card-header">
-            <el-icon class="card-icon"><Document /></el-icon>
-            <span>同步法律条文</span>
-          </div>
-        </template>
+      <div class="sync-card">
+        <div class="card-header">
+          <el-icon class="card-icon"><Document /></el-icon>
+          <span>同步法律条文</span>
+        </div>
         
         <div class="sync-content">
           <p class="sync-description">
@@ -237,7 +239,8 @@ const syncLawCases = async () => {
           </p>
           
           <!-- 法律书选择 -->
-          <el-form-item label="法律书" class="law-book-select">
+          <div class="law-book-select">
+            <label class="section-label">法律书</label>
             <el-select v-model="selectedLawBookId" placeholder="请选择要同步的法律书" style="width: 100%">
               <el-option
                 v-for="lawBook in lawBookList"
@@ -246,7 +249,7 @@ const syncLawCases = async () => {
                 :value="lawBook.id"
               />
             </el-select>
-          </el-form-item>
+          </div>
           
           <div class="sync-status" :class="{
             'status-loading': syncStatus.lawArticle.loading,
@@ -270,16 +273,14 @@ const syncLawCases = async () => {
             <el-icon><Refresh /></el-icon> 开始同步
           </el-button>
         </div>
-      </el-card>
+      </div>
       
       <!-- 同步法律案例卡片 -->
-      <el-card class="sync-card">
-        <template #header>
-          <div class="card-header">
-            <el-icon class="card-icon"><HelpFilled /></el-icon>
-            <span>同步法律案例</span>
-          </div>
-        </template>
+      <div class="sync-card">
+        <div class="card-header">
+          <el-icon class="card-icon"><HelpFilled /></el-icon>
+          <span>同步法律案例</span>
+        </div>
         
         <div class="sync-content">
           <p class="sync-description">
@@ -306,80 +307,143 @@ const syncLawCases = async () => {
             <el-icon><Refresh /></el-icon> 开始同步
           </el-button>
         </div>
-      </el-card>
+      </div>
     </div>
     
     <div class="sync-tips">
-      <el-alert
-        title="同步提示"
-        type="info"
-        :closable="false"
-        show-icon
-      >
-        <ul>
-          <li>同步过程可能需要几分钟时间，请耐心等待</li>
-          <li>同步过程中请勿关闭浏览器或刷新页面</li>
-          <li>同步完成后系统会自动更新知识库数据</li>
-        </ul>
-      </el-alert>
+      <div class="tips-card">
+        <div class="tips-header">
+          <el-icon class="tips-icon"><HelpFilled /></el-icon>
+          <h3 class="tips-title">同步提示</h3>
+        </div>
+        <div class="tips-content">
+          <ul>
+            <li>同步过程可能需要几分钟时间，请耐心等待</li>
+            <li>同步过程中请勿关闭浏览器或刷新页面</li>
+            <li>同步完成后系统会自动更新知识库数据</li>
+          </ul>
+        </div>
+      </div>
     </div>
 </template>
 
 <style scoped>
+/* 页面变量 */
+:root {
+  --bg-primary: #F7F5F0;
+  --bg-secondary: #FFFFFF;
+  --accent: #C9A962;
+  --accent-light: #E8D5A3;
+  --accent-dark: #A68B4B;
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #7A7A7A;
+  --border: #E0DCD4;
+  --card-shadow: 0 2px 12px rgba(45, 59, 53, 0.08);
+  --card-shadow-hover: 0 8px 24px rgba(45, 59, 53, 0.12);
+  --sidebar-bg: #1E3A2F;
+}
+
 /* 页面容器 */
 .sync-container {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-primary);
   min-height: 100vh;
 }
 
-/* 页面头部样式 */
+/* 页面头部样式 - 悬浮卡片效果 */
 .page-header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3584e4 100%);
+  background: linear-gradient(135deg, #1E3A2F 0%, #2A4A3F 100%) !important;
   border-radius: 16px;
-  padding: 32px 40px;
+  padding: 28px 32px;
   margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(30, 60, 114, 0.25);
+  box-shadow: 
+    0 4px 6px rgba(30, 58, 47, 0.05),
+    0 10px 20px rgba(30, 58, 47, 0.1),
+    0 20px 40px rgba(30, 58, 47, 0.15);
+  border: 1px solid rgba(201, 169, 98, 0.2);
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.page-header:hover {
+  box-shadow: 
+    0 6px 12px rgba(30, 58, 47, 0.08),
+    0 16px 32px rgba(30, 58, 47, 0.15),
+    0 30px 60px rgba(30, 58, 47, 0.2);
+  transform: translateY(-4px);
+  border-color: rgba(201, 169, 98, 0.35);
 }
 
 .page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.page-header::after {
   content: '';
   position: absolute;
   top: -50%;
   right: -10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201, 169, 98, 0.15) 0%, transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.page-header:hover::after {
+  transform: scale(1.1);
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
   position: relative;
   z-index: 1;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
 }
 
 .header-icon {
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #C9A962, #E8D5A3);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #d4af37;
+  color: var(--sidebar-bg);
   flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+}
+
+.header-icon:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(201, 169, 98, 0.4);
 }
 
 .header-icon svg {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }
 
 .header-text {
@@ -387,20 +451,33 @@ const syncLawCases = async () => {
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 4px 0;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 28px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 1.2;
+  transition: all 0.3s ease;
 }
 
 .page-subtitle {
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.8);
   margin: 0;
-  font-weight: 400;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  line-height: 1.3;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
 .header-decoration {
@@ -435,16 +512,36 @@ const syncLawCases = async () => {
 
 /* 卡片样式 */
 .sync-card {
-  border-radius: 12px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(30, 60, 114, 0.08);
+  box-shadow: 
+    0 2px 4px rgba(45, 59, 53, 0.04),
+    0 6px 12px rgba(45, 59, 53, 0.06),
+    0 16px 28px rgba(45, 59, 53, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(224, 220, 212, 0.8);
+  position: relative;
+}
+
+.sync-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 14px 14px 0 0;
 }
 
 .sync-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(45, 59, 53, 0.06),
+    0 12px 24px rgba(45, 59, 53, 0.1),
+    0 24px 48px rgba(45, 59, 53, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(201, 169, 98, 0.3);
 }
 
 .card-header {
@@ -453,12 +550,20 @@ const syncLawCases = async () => {
   gap: 8px;
   font-size: 18px;
   font-weight: 600;
-  color: #1e3c72;
+  color: var(--text-primary);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.5px;
 }
 
 .card-icon {
   font-size: 20px;
-  color: #d4af37;
+  color: var(--accent-dark);
+  background: rgba(201, 169, 98, 0.15);
+  padding: 6px;
+  border-radius: 6px;
 }
 
 .sync-content {
@@ -467,9 +572,10 @@ const syncLawCases = async () => {
 
 .sync-description {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 20px;
   line-height: 1.5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .sync-status {
@@ -481,22 +587,26 @@ const syncLawCases = async () => {
   margin-bottom: 20px;
   font-size: 14px;
   transition: all 0.3s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .sync-status.status-loading,
 .sync-status.status-polling {
-  background-color: rgba(30, 60, 114, 0.08);
-  color: #1e3c72;
+  background-color: rgba(201, 169, 98, 0.1);
+  color: var(--accent-dark);
+  border: 1px solid rgba(201, 169, 98, 0.2);
 }
 
 .sync-status.status-success {
-  background-color: rgba(103, 194, 58, 0.1);
-  color: #67c23a;
+  background-color: rgba(72, 187, 120, 0.12);
+  color: #2F855A;
+  border: 1px solid rgba(72, 187, 120, 0.2);
 }
 
 .sync-status.status-error {
-  background-color: rgba(245, 108, 108, 0.1);
-  color: #f56c6c;
+  background-color: rgba(229, 62, 62, 0.12);
+  color: #C53030;
+  border: 1px solid rgba(229, 62, 62, 0.2);
 }
 
 .status-icon {
@@ -519,27 +629,44 @@ const syncLawCases = async () => {
   margin-bottom: 20px;
 }
 
-.law-book-select :deep(.el-form-item__label) {
-  font-weight: 600;
-  color: #1e3c72;
+.law-book-select .section-label {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 80px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1.4;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   margin-bottom: 8px;
+  display: block;
 }
 
 .law-book-select :deep(.el-select .el-input__wrapper) {
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(45, 59, 53, 0.06);
+  transition: all 0.2s ease;
   cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-primary) !important;
 }
 
 .law-book-select :deep(.el-select .el-input__wrapper:hover) {
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+  box-shadow: 0 4px 12px rgba(45, 59, 53, 0.1);
+  border-color: var(--accent-light);
 }
 
 .law-book-select :deep(.el-select .el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(30, 60, 114, 0.1), 0 4px 12px rgba(30, 60, 114, 0.15);
-  border-color: #1e3c72;
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.15);
+  border-color: var(--accent);
+}
+
+.law-book-select :deep(.el-select .el-input__inner) {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* 按钮样式 */
@@ -547,17 +674,39 @@ const syncLawCases = async () => {
   width: 100%;
   padding: 10px 0;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.3);
+  background: linear-gradient(135deg, #C9A962, #E8D5A3);
+  color: var(--sidebar-bg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.sync-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+  z-index: -1;
+}
+
+.sync-button:hover::before {
+  left: 100%;
 }
 
 .sync-button:hover {
+  background: linear-gradient(135deg, #E8D5A3, #C9A962);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+  box-shadow: 0 6px 16px rgba(201, 169, 98, 0.4);
 }
 
 /* 提示信息 */
@@ -565,14 +714,80 @@ const syncLawCases = async () => {
   margin-top: 24px;
 }
 
-.sync-tips ul {
-  margin: 12px 0 0 20px;
-  color: #666;
-  font-size: 14px;
+.tips-card {
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  border: 1px solid rgba(224, 220, 212, 0.8);
+  box-shadow: 
+    0 2px 4px rgba(45, 59, 53, 0.04),
+    0 6px 12px rgba(45, 59, 53, 0.06),
+    0 16px 28px rgba(45, 59, 53, 0.08);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-.sync-tips li {
-  margin-bottom: 4px;
+.tips-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 14px 14px 0 0;
+}
+
+.tips-card:hover {
+  box-shadow: 
+    0 4px 8px rgba(45, 59, 53, 0.06),
+    0 12px 24px rgba(45, 59, 53, 0.1),
+    0 24px 48px rgba(45, 59, 53, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(201, 169, 98, 0.3);
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.tips-icon {
+  font-size: 20px;
+  color: var(--accent-dark);
+  background: rgba(201, 169, 98, 0.15);
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.tips-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.5px;
+}
+
+.tips-content {
+  padding: 24px;
+}
+
+.tips-content ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.tips-content li {
+  margin-bottom: 8px;
+  line-height: 1.4;
 }
 
 /* 响应式设计 */
@@ -582,17 +797,21 @@ const syncLawCases = async () => {
   }
   
   .page-title {
-    font-size: 28px;
+    font-size: 24px;
   }
   
   .header-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
   
   .header-icon svg {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .sync-cards {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -604,6 +823,12 @@ const syncLawCases = async () => {
   .header-content {
     flex-direction: column;
     text-align: center;
+    gap: 12px;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    text-align: center;
   }
   
   .header-decoration {
@@ -611,14 +836,14 @@ const syncLawCases = async () => {
   }
   
   .page-title {
-    font-size: 24px;
-  }
-  
-  .sync-cards {
-    grid-template-columns: 1fr;
+    font-size: 20px;
   }
   
   .sync-content {
+    padding: 16px;
+  }
+  
+  .tips-content {
     padding: 16px;
   }
 }
