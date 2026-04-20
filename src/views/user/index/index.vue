@@ -1,7 +1,7 @@
 <template>
   <div class="app">
-    <!-- 顶部导航栏 -->
-    <el-header height="60px" class="navbar">
+    <!-- 顶部导航栏 (AI页面时隐藏) -->
+    <el-header v-if="$route.path !== '/user/ai'" height="60px" class="navbar">
       <div class="navbar-container">
         <router-link to="/user" class="logo">法律咨询平台</router-link>
         <div class="search-container">
@@ -29,7 +29,7 @@
     </el-header>
 
     <!-- 主内容区 -->
-    <main class="main-content">
+    <main :class="['main-content', { 'ai-page': $route.path === '/user/ai' }]">
       <!-- 子路由内容 -->
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
@@ -147,8 +147,8 @@
       </template>
     </main>
 
-    <!-- 底部信息栏 -->
-    <footer class="footer">
+    <!-- 底部信息栏 (AI页面时隐藏) -->
+    <footer v-if="$route.path !== '/user/ai'" class="footer">
       <div class="footer-container">
         <div class="footer-column">
           <h3><i class="el-icon-office-building"></i> 关于我们</h3>
@@ -265,7 +265,13 @@ async function handleSearch() {
     const response = await searchLawContentApi(searchQuery.value);
     // 处理搜索结果
     console.log('搜索结果:', response.data);
-    // 可以根据需要跳转到搜索结果页面或在当前页面显示结果
+    // 跳转到搜索结果页面
+    router.push({
+      path: '/user/search',
+      query: {
+        keyword: searchQuery.value
+      }
+    });
   } catch (err) {
     error.value = '搜索失败，请重试';
     console.error('搜索失败:', err);
@@ -503,6 +509,13 @@ function handleLogout() {
 .main-content {
   margin-top: 70px;
   flex: 1;
+}
+
+/* AI页面样式 */
+.main-content.ai-page {
+  margin-top: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* 轮播图 */
