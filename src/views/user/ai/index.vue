@@ -40,10 +40,15 @@
         <div class="space-y-2">
           <div v-for="(history, index) in chatHistoryList" :key="index" class="p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition-all duration-300 cursor-pointer hover:shadow-sm">
             <div v-if="sidebarExpanded" class="flex justify-between items-start">
-              <h3 class="font-medium text-sm">{{ history.title }}</h3>
-              <span class="text-xs text-gray-400">{{ history.time }}</span>
+              <h3 class="font-medium text-sm" @click="loadChatHistory(history.sessionId)">{{ history.title }}</h3>
+              <div class="flex items-center">
+                <span class="text-xs text-gray-400 mr-2">{{ history.time }}</span>
+                <button @click.stop="deleteSession(history.sessionId, index)" class="text-gray-400 hover:text-red-500 transition-all duration-300 p-1 rounded-full hover:bg-gray-100 hover:shadow-md transform hover:scale-105">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
             </div>
-            <p v-if="sidebarExpanded" class="text-xs text-gray-500 mt-1 line-clamp-2">{{ history.content }}</p>
+            <p v-if="sidebarExpanded" class="text-xs text-gray-500 mt-1 line-clamp-2" @click="loadChatHistory(history.sessionId)">{{ history.content }}</p>
           </div>
         </div>
       </div>
@@ -124,7 +129,20 @@
           </div>
           <div v-if="message.type === 'ai'" class="ml-4 max-w-[80%]">
             <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100">
-              <p class="text-gray-800">{{ message.content }}</p>
+              <p class="text-gray-800" v-html="message.content.replace(/\r?\n/g, '<br>')"></p>
+              <!-- 数据卡片展示 -->
+              <div v-if="message.dataCards && message.dataCards.length > 0" class="mt-4 space-y-3">
+                <div v-for="(card, cardIndex) in message.dataCards" :key="cardIndex" class="border border-gray-200 rounded-lg p-3 bg-blue-50 hover:bg-blue-100 transition-all duration-300 cursor-pointer" @click="navigateToDetail(card)">
+                  <div v-if="card.type === 'law_article'" class="">
+                    <h4 class="font-medium text-primary">{{ card.lawArticle.bookTitle }} - {{ card.lawArticle.articleTitle }}</h4>
+                    <p class="text-sm text-gray-700 mt-2">{{ card.lawArticle.content }}</p>
+                    <div class="text-xs text-gray-500 mt-2 flex justify-between">
+                      <span>发布日期: {{ formatDate(card.lawArticle.publishDate) }}</span>
+                      <span>生效日期: {{ formatDate(card.lawArticle.effectiveDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="text-xs text-gray-500 mt-1">{{ message.time }}</div>
           </div>
@@ -160,7 +178,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { sendMessageApi, getHistoryApi, saveChatApi, uploadFileApi, createSessionApi } from '@/api/ai';
+import { sendMessageApi, getHistoryApi, saveChatApi, uploadFileApi, createSessionApi, getChatDetailApi, deleteSessionApi } from '@/api/ai';
 
 const router = useRouter();
 
@@ -168,6 +186,7 @@ const router = useRouter();
 const sidebarExpanded = ref(true);
 const mode = ref('consult'); // study 或 consult
 const userInput = ref('');
+const sessionId = ref('');
 const messages = ref([
   {
     type: 'ai',
@@ -225,19 +244,30 @@ const sendMessage = async () => {
     
     // 调用API获取AI回复
     try {
+      console.log('发送消息前的sessionId:', sessionId.value);
       const response = await sendMessageApi({
-        message,
-        mode: mode.value
+        sessionId: sessionId.value,
+        question: message
       });
+      console.log('API响应:', response);
       
       // 添加AI回复
       const aiNow = new Date();
       const aiTime = aiNow.getHours().toString().padStart(2, '0') + ':' + aiNow.getMinutes().toString().padStart(2, '0');
+      console.log('准备添加AI回复:', response.data.answer);
       messages.value.push({
         type: 'ai',
-        content: response.data.reply,
-        time: aiTime
+        content: response.data.answer || '无回复内容',
+        time: aiTime,
+        dataCards: response.data.data_cards || []
       });
+      console.log('消息添加后:', messages.value);
+      
+      // 滚动到最新消息
+      setTimeout(() => {
+        const chatHistory = document.getElementById('chatHistory');
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }, 100);
       
       // 暂时注释掉语音相关功能
       // 如果语音模式开启，朗读回复内容
@@ -254,6 +284,12 @@ const sendMessage = async () => {
         content: '抱歉，我暂时无法回答您的问题，请稍后再试。',
         time: errorTime
       });
+      
+      // 滚动到最新消息
+      setTimeout(() => {
+        const chatHistory = document.getElementById('chatHistory');
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }, 100);
     }
   }
 };
@@ -328,6 +364,120 @@ const saveChat = () => {
   // 这里可以添加保存对话的逻辑，比如将对话内容保存到本地存储或服务器
 };
 
+const formatDate = (date) => {
+  if (!date) return '';
+  
+  // 处理时间戳
+  if (typeof date === 'number') {
+    const d = new Date(date);
+    return d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0');
+  }
+  
+  // 处理日期字符串
+  if (typeof date === 'string') {
+    // 处理ISO格式的日期字符串
+    if (date.includes('T')) {
+      return date.split('T')[0];
+    }
+    // 处理普通日期字符串
+    return date;
+  }
+  
+  return '';
+};
+
+const loadChatHistory = async (sessionIdParam) => {
+  try {
+    // 更新当前sessionId
+    sessionId.value = sessionIdParam;
+    
+    // 调用API获取对话详情
+    const response = await getChatDetailApi(sessionIdParam);
+    
+    if (response.code === 1 && response.data) {
+      // 清空当前消息列表
+      messages.value = [];
+      
+      // 处理返回的对话消息
+      response.data.forEach(item => {
+        // 添加用户问题
+        messages.value.push({
+          type: 'user',
+          content: item.question,
+          time: item.createTime
+        });
+        
+        // 添加AI回答
+        messages.value.push({
+          type: 'ai',
+          content: item.answer,
+          time: item.createTime,
+          dataCards: item.dataCards || []
+        });
+      });
+      
+      // 滚动到最新消息
+      setTimeout(() => {
+        const chatHistory = document.getElementById('chatHistory');
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }, 100);
+    }
+  } catch (error) {
+    console.error('加载历史对话失败:', error);
+  }
+};
+
+const deleteSession = async (sessionIdParam, index) => {
+  // 显示确认弹窗
+  if (confirm('确定要删除该会话吗？')) {
+    try {
+      // 调用API删除会话
+      const response = await deleteSessionApi(sessionIdParam);
+      
+      if (response.code === 1) {
+        // 从本地列表中移除会话
+        chatHistoryList.value.splice(index, 1);
+        
+        // 如果当前正在查看的是被删除的会话，清空消息列表
+        if (sessionId.value === sessionIdParam) {
+          messages.value = [
+            {
+              type: 'ai',
+              content: '您好！我是法律智能助手，很高兴为您提供法律咨询服务。请问有什么法律问题需要帮助？',
+              time: '09:00'
+            }
+          ];
+          // 重新生成sessionId
+          const generateUUID = () => {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              const r = Math.random() * 16 | 0;
+              const v = c === 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+            // 确保UUID长度不超过64个字符
+            return uuid.substring(0, 64);
+          };
+          sessionId.value = generateUUID();
+        }
+      }
+    } catch (error) {
+      console.error('删除会话失败:', error);
+    }
+  }
+};
+
+const navigateToDetail = (card) => {
+  if (card.type === 'law_article') {
+    // 跳转到法律条文详情页面，并传递当前页面路径作为参数
+    router.push({
+      path: `/user/law/detail/${card.lawArticle.id}`,
+      query: {
+        returnPath: '/user/ai'
+      }
+    });
+  }
+};
+
 const createNewChat = async () => {
   // 生成UUID，确保长度不超过64个字符
   const generateUUID = () => {
@@ -340,11 +490,12 @@ const createNewChat = async () => {
     return uuid.substring(0, 64);
   };
   
-  const sessionId = generateUUID();
+  const newSessionId = generateUUID();
+  sessionId.value = newSessionId;
   
   try {
     // 调用createSession接口，将前端生成的UUID作为sessionId传入
-    const response = await createSessionApi(sessionId);
+    const response = await createSessionApi(newSessionId);
     
     // 清空当前消息列表
     messages.value = [];
@@ -385,8 +536,8 @@ const createNewChat = async () => {
     });
     
     const newChat = {
-      id: sessionId,
-      sessionId: sessionId,
+      id: newSessionId,
+      sessionId: newSessionId,
       title: '新对话',
       time: '刚刚',
       content: '我是一位专业、严谨的法律信息助理，我叫小鱼律智助手...'
@@ -397,7 +548,42 @@ const createNewChat = async () => {
 };
 
 // 组件挂载时初始化
-onMounted(() => {
+onMounted(async () => {
+  // 初始化sessionId
+  if (!sessionId.value) {
+    const generateUUID = () => {
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      // 确保UUID长度不超过64个字符
+      return uuid.substring(0, 64);
+    };
+    sessionId.value = generateUUID();
+  }
+  
+  // 获取历史对话数据
+  try {
+    const response = await getHistoryApi();
+    if (response.code === 1 && response.data && response.data.length > 0) {
+      // 处理历史对话数据，截断title和content
+      chatHistoryList.value = response.data.map(item => ({
+        id: item.id,
+        sessionId: item.sessionId,
+        title: item.title.length > 10 ? item.title.substring(0, 10) + '...' : item.title,
+        time: item.createTime,
+        content: item.content.length > 15 ? item.content.substring(0, 15) + '...' : item.content
+      }));
+      
+      // 自动加载最近一次的对话详情
+      const latestSessionId = response.data[0].sessionId;
+      await loadChatHistory(latestSessionId);
+    }
+  } catch (error) {
+    console.error('获取历史对话失败:', error);
+  }
+  
   // 滚动到最新消息
   const chatHistory = document.getElementById('chatHistory');
   chatHistory.scrollTop = chatHistory.scrollHeight;
