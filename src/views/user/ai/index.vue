@@ -129,7 +129,19 @@
           </div>
           <div v-if="message.type === 'ai'" class="ml-4 max-w-[80%]">
             <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100">
-              <p class="text-gray-800" v-html="message.content.replace(/\r?\n/g, '<br>')"></p>
+              <!-- 加载动画 -->
+              <div v-if="message.loading" class="flex items-center space-x-2 py-2">
+                <div class="flex space-x-1">
+                  <div class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+                <span class="text-sm text-gray-500">正在思考...</span>
+              </div>
+              <!-- 消息内容 -->
+              <p v-else class="text-gray-800" v-html="message.content.replace(/\r?\n/g, '<br>')"></p>
+              <!-- 流式输入光标 -->
+              <span v-if="isStreaming && !message.loading && message === messages[messages.length - 1]" class="inline-block w-2 h-5 bg-primary ml-1 animate-pulse"></span>
               <!-- 数据卡片展示 -->
               <div v-if="message.dataCards && message.dataCards.length > 0" class="mt-4 space-y-3">
                 <div v-for="(card, cardIndex) in message.dataCards" :key="cardIndex" class="border border-gray-200 rounded-lg p-3 bg-blue-50 hover:bg-blue-100 transition-all duration-300 cursor-pointer" @click="navigateToDetail(card)">
@@ -156,16 +168,17 @@
       <div class="bg-white border-t border-gray-200 p-6 shadow-sm">
         <div class="relative w-full">
           <div class="flex items-center w-full">
-            <input 
-              type="text" 
-              id="userInput" 
-              v-model="userInput" 
-              placeholder="请输入您的法律问题..." 
-              class="flex-1 border-2 border-primary rounded-full px-6 py-6 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-base"
+            <input
+              type="text"
+              id="userInput"
+              v-model="userInput"
+              :disabled="isStreaming"
+              :placeholder="isStreaming ? 'AI正在回答中...' : '请输入您的法律问题...'"
+              class="flex-1 border-2 border-primary rounded-full px-6 py-6 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
               @keypress.enter="sendMessage"
             >
-            <button id="sendButton" @click="sendMessage" class="ml-3 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-secondary transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-              <i class="fa fa-paper-plane"></i>
+            <button id="sendButton" @click="sendMessage" :disabled="isStreaming" :class="['ml-3 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105', isStreaming ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary text-white hover:bg-secondary']">
+              <i :class="['fa', isStreaming ? 'fa-spinner fa-spin' : 'fa-paper-plane']"></i>
             </button>
           </div>
           
@@ -178,7 +191,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { sendMessageApi, getHistoryApi, saveChatApi, uploadFileApi, createSessionApi, getChatDetailApi, deleteSessionApi } from '@/api/ai';
+import { sendMessageApi, sendMessageStreamApi, getHistoryApi, saveChatApi, uploadFileApi, createSessionApi, getChatDetailApi, deleteSessionApi } from '@/api/ai';
 
 const router = useRouter();
 
@@ -229,9 +242,11 @@ const switchMode = (newMode) => {
   mode.value = newMode;
 };
 
+const isStreaming = ref(false);
+
 const sendMessage = async () => {
   const message = userInput.value.trim();
-  if (message) {
+  if (message && !isStreaming.value) {
     // 添加用户消息
     const now = new Date();
     const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
@@ -241,56 +256,64 @@ const sendMessage = async () => {
       time
     });
     userInput.value = '';
-    
-    // 调用API获取AI回复
-    try {
-      console.log('发送消息前的sessionId:', sessionId.value);
-      const response = await sendMessageApi({
-        sessionId: sessionId.value,
-        question: message
-      });
-      console.log('API响应:', response);
-      
-      // 添加AI回复
-      const aiNow = new Date();
-      const aiTime = aiNow.getHours().toString().padStart(2, '0') + ':' + aiNow.getMinutes().toString().padStart(2, '0');
-      console.log('准备添加AI回复:', response.data.answer);
-      messages.value.push({
-        type: 'ai',
-        content: response.data.answer || '无回复内容',
-        time: aiTime,
-        dataCards: response.data.data_cards || []
-      });
-      console.log('消息添加后:', messages.value);
-      
-      // 滚动到最新消息
-      setTimeout(() => {
-        const chatHistory = document.getElementById('chatHistory');
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-      }, 100);
-      
-      // 暂时注释掉语音相关功能
-      // 如果语音模式开启，朗读回复内容
-      // if (voiceEnabled.value && 'speechSynthesis' in window) {
-      //   speakText(response.data.reply);
-      // }
-    } catch (error) {
-      console.error('发送消息失败:', error);
-      // 添加错误回复
-      const errorNow = new Date();
-      const errorTime = errorNow.getHours().toString().padStart(2, '0') + ':' + errorNow.getMinutes().toString().padStart(2, '0');
-      messages.value.push({
-        type: 'ai',
-        content: '抱歉，我暂时无法回答您的问题，请稍后再试。',
-        time: errorTime
-      });
-      
-      // 滚动到最新消息
-      setTimeout(() => {
-        const chatHistory = document.getElementById('chatHistory');
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-      }, 100);
-    }
+
+    // 添加 AI 占位消息（带加载动画）
+    const aiTime = new Date();
+    const aiTimeStr = aiTime.getHours().toString().padStart(2, '0') + ':' + aiTime.getMinutes().toString().padStart(2, '0');
+    const aiMsgIndex = messages.value.length;
+    messages.value.push({
+      type: 'ai',
+      content: '',
+      time: aiTimeStr,
+      dataCards: [],
+      loading: true
+    });
+
+    isStreaming.value = true;
+
+    // 滚动到最新消息
+    setTimeout(() => {
+      const chatHistory = document.getElementById('chatHistory');
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }, 100);
+
+    // 调用流式 API
+    sendMessageStreamApi(message, sessionId.value, {
+      onToken: (token) => {
+        // 追加 token 到 AI 消息
+        messages.value[aiMsgIndex].content += token;
+        messages.value[aiMsgIndex].loading = false;
+
+        // 滚动到最新消息
+        setTimeout(() => {
+          const chatHistory = document.getElementById('chatHistory');
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+        }, 50);
+      },
+      onComplete: (event) => {
+        // 流式完成，更新数据卡片
+        messages.value[aiMsgIndex].dataCards = event.data_cards || [];
+        messages.value[aiMsgIndex].loading = false;
+        isStreaming.value = false;
+
+        // 如果没有收到任何 token，使用完整答案
+        if (!messages.value[aiMsgIndex].content && event.answer) {
+          messages.value[aiMsgIndex].content = event.answer;
+        }
+
+        // 滚动到最新消息
+        setTimeout(() => {
+          const chatHistory = document.getElementById('chatHistory');
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+        }, 100);
+      },
+      onError: (errorMsg) => {
+        console.error('流式消息失败:', errorMsg);
+        messages.value[aiMsgIndex].content = messages.value[aiMsgIndex].content || '抱歉，我暂时无法回答您的问题，请稍后再试。';
+        messages.value[aiMsgIndex].loading = false;
+        isStreaming.value = false;
+      }
+    });
   }
 };
 
@@ -988,6 +1011,19 @@ button {
   50% {
     opacity: 0.5;
   }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
 }
 
 /* 隐藏样式 */
